@@ -1,0 +1,10 @@
+language: node_js
+node_js: node
+deploy:
+  provider: heroku
+  api_key:
+    secure: cJI+PHqAjWd6sKe82DdDAivJhqYHQixJG+fKGDXSjemI1Bl1whjMl+8T2KR6IduLVh/PnQI2jhhYbC83qSnTE3M/qwdcXLp9ba3MD0rCNoVllCPUUFAR+nTRR79k4xBos9D2T81vvwgE8uqzl2S+V7TT0QUbIMU7R+00gRrnCjevqRvebI+XfNM7ldMSfWsgMwVrURK2z9sAyhqBY3zb0WeWdrgsqjSRXNCvW+QnNbHM+4Dmamwyl8ZA70l9ip4LRYoCEOuIAOecr3vwpT0keGmAX1XQahfsz1DFuYe94WgA6SpnketSqdBAV54I3tQZTxayStBdQXKjgKE3C4E9pshO3wMWwovvUK65obl2QkQfzFICfCgY/8V2Edqhz0WlaOYBcnKb/Tgy6LRuOq5Bt7jtOcC4bw11ruekfoG04UxZwPAMs2OsswXT2hYBGckep8qTD08apKuKbxw4NGAjgJpM9ebWGPBnhvhNL9RIuDF1x3Ish2WWii76L2AnGI0ZD3YjQWaph6VxohDPepXM4XpnvFN4M+Y4fWQA5b/xNgV5KE5zzNvQoOTEVHACyenHV77u1cqley8zG0JGDqzMUrRnb7V6CR9Z6USkMNkG6leUpse5/99LrdaozRhBpOeINmzl0s3kuVty/4I4vI8WmZzQzcX5rvk8iABVCCBEQf4=
+  app: dry-journey-73787
+  on:
+    repo: aamay001/imnext-api
+    branch: master
