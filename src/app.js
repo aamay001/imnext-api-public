@@ -12,6 +12,7 @@ const stopServer = () => serverHandle.stop();
 
 const app = express();
 serverHandle.use(app);
+app.use(express.static('src/public'));
 
 const { DEVELOPMENT } = config;
 if (DEVELOPMENT) {
