@@ -18,6 +18,8 @@ const CAPTCHA_SITE_KEY = process.env.CAPTCHA_SITE_KEY;
 const CAPTCHA_SECRET = process.env.CAPTCHA_SECRET;
 let MONGOOSE_DB;
 
+console.info(`BABEL_ENV ${process.env.BABEL_ENV}`)
+
 export default {
   PORT,
   DATABASE_NAME,

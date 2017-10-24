@@ -1,26 +1,51 @@
 {
-  "presets": [
-    [
-      "env",
-      {
-        "targets": {
-          "node": "6.10"
-        }
-      }
-    ]
-  ],
-  "plugins": [
-    [
-      "transform-object-rest-spread",
-      {
-        "useBuiltIns": true
-      }
-    ],
-    [
-      "inline-dotenv",
-      {
-        "path": "./.env"
-      }
-    ]
-  ]
+
+  "env" : {
+    "production" : {
+      "presets": [
+        [
+          "env",
+          {
+            "targets": {
+              "node": "6.10"
+            }
+          }
+        ]
+      ],
+      "plugins": [
+        [
+          "transform-object-rest-spread",
+          {
+            "useBuiltIns": true
+          }
+        ]
+      ]
+    },
+    "development": {
+      "presets": [
+        [
+          "env",
+          {
+            "targets": {
+              "node": "6.10"
+            }
+          }
+        ]
+      ],
+      "plugins": [
+        [
+          "transform-object-rest-spread",
+          {
+            "useBuiltIns": true
+          }
+        ],
+        [
+          "inline-dotenv",
+          {
+            "path": "./.env"
+          }
+        ]
+      ]
+    }
+  }
 }
