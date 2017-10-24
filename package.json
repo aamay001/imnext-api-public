@@ -4,10 +4,10 @@
   "description": "imNext API",
   "main": "app.js",
   "scripts": {
-    "test": "NODE_ENV=test mocha ./test",
-    "start": "node app.js",
-    "dev": "nodemon app.js",
-    "debug": "inspect --debug-brk server"
+    "test": "NODE_ENV=test mocha --require babel-register src/*",
+    "start": "babel-node src/app.js node",
+    "dev": "nodemon src/app.js --exec babel-node",
+    "prettier": "prettier --single-quote --print-width 80 --trailing-comma all --write 'src/**/*.js'"
   },
   "author": "Andy Amaya",
   "license": "ISC",
@@ -27,12 +27,19 @@
     "twilio": "^3.9.0"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "chai-datetime": "^1.5.0",
     "chai-http": "^3.0.0",
     "dot-env": "0.0.1",
+    "eslint": "^4.9.0",
+    "eslint-config-equimper": "^2.2.1",
+    "eslint-config-prettier": "^2.6.0",
     "faker": "^4.1.0",
-    "mocha": "^4.0.1"
+    "mocha": "^4.0.1",
+    "prettier": "^1.7.4"
   }
 }

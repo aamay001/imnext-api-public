@@ -2,8 +2,12 @@
 
 const PORT = process.env.PORT || 8080;
 const DATABASE_NAME = 'im-next';
-const DATABASE_URL = process.env.DATABASE_URL || global.DATABASE_URL || `mongodb://localhost/${DATABASE_NAME}`;
-const TEST_DATABASE_URL = process.env.TEST_DATABASE_URL || `mongodb://localhost/test-${DATABASE_NAME}`
+const DATABASE_URL =
+  process.env.DATABASE_URL ||
+  global.DATABASE_URL ||
+  `mongodb://localhost/${DATABASE_NAME}`;
+const TEST_DATABASE_URL =
+  process.env.TEST_DATABASE_URL || `mongodb://localhost/test-${DATABASE_NAME}`;
 const TOKEN_SECRET = process.env.TOKEN_SECRET;
 const TOKEN_EXP = process.env.TOKEN_EXP || '7d';
 const DEVELOPMENT = process.env.NODE_ENV === 'dev';
@@ -14,9 +18,9 @@ const TWILIO_NUMBER = process.env.TWILIO_NUMBER;
 const TEST_CONFIRM_NUMBER = process.env.TEST_CONFIRM_NUMBER;
 const CAPTCHA_SITE_KEY = process.env.CAPTCHA_SITE_KEY;
 const CAPTCHA_SECRET = process.env.CAPTCHA_SECRET;
-var MONGOOSE_DB;
+let MONGOOSE_DB;
 
-module.exports = {
+export default {
   PORT,
   DATABASE_NAME,
   DATABASE_URL,
@@ -30,5 +34,6 @@ module.exports = {
   TWILIO_NUMBER,
   TEST_CONFIRM_NUMBER,
   CAPTCHA_SECRET,
-  CAPTCHA_SITE_KEY
-}
+  CAPTCHA_SITE_KEY,
+  MONGOOSE_DB,
+};

@@ -1,0 +1,30 @@
+/* eslint-disable no-console */
+
+'use strict';
+
+import 'dot-env';
+import express from 'express';
+import { config, constants } from './config';
+import serverHandle from './app/server';
+
+const startServer = () => serverHandle.start();
+const stopServer = () => serverHandle.stop();
+
+const app = express();
+serverHandle.use(app);
+
+const { DEVELOPMENT } = config;
+if (DEVELOPMENT) {
+  const colors = require('colors');
+  console.info('DEVELOPMENT'.yellow);
+  const morgan = require('morgan');
+  app.use(morgan('dev'));
+}
+
+if (require.main === module) {
+  startServer().catch(err => {
+    console.error(err.red);
+  });
+}
+
+export { app, startServer, stopServer };
