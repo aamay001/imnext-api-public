@@ -17,7 +17,6 @@ const { DEVELOPMENT } = config;
 if (DEVELOPMENT) {
   const colors = require('colors');
   console.info('DEVELOPMENT'.yellow);
-  require('dot-env');
   const morgan = require('morgan');
   app.use(morgan('dev'));
 }

@@ -1,7 +1,14 @@
 import config from './config';
 import colors from 'colors';
 
+const REGEX = {
+  PASSWORD: '/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/',
+  PHONE: '/^(+0?1s)?(?d{3})?[s.-]d{3}[s.-]d{4}$/',
+  EMAIL: '/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:.[a-zA-Z0-9-]+)*$/',
+};
+
 export default {
+  REGEX,
   SERVER_START_SUCCESS: `Server start success. Server is listening on port ${config.PORT}.`
     .green,
   SERVER_START_ERROR: err => `Server start error. Error: ${err}`.red,

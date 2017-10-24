@@ -15,6 +15,12 @@
       {
         "useBuiltIns": true
       }
+    ],
+    [
+      "inline-dotenv",
+      {
+        "path": "./.env"
+      }
     ]
   ]
 }
