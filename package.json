@@ -2,6 +2,13 @@
   "name": "imnext-api",
   "version": "1.0.0",
   "description": "imNext API",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aamay001/imnext-api.git"
+  },
+  "engines": {
+    "node": "8.7.0"
+  },
   "main": "app.js",
   "scripts": {
     "test": "NODE_ENV=test mocha --require babel-register src/*",
