@@ -5,6 +5,7 @@
 import express from 'express';
 import { config, constants } from './config';
 import serverHandle from './app/server';
+import routes from './routes/';
 
 const app = express();
 
@@ -21,6 +22,8 @@ const stopServer = () => serverHandle.stop();
 
 serverHandle.use(app);
 app.use(express.static('src/public'));
+
+app.use('/api/user', routes.user);
 
 if (require.main === module) {
   startServer().catch(err => {

@@ -12,11 +12,11 @@
   },
   "main": "app.js",
   "scripts": {
-    "test-dev": "NODE_ENV=test BABEL_ENV=development mocha --require babel-register src/*",
+    "test-dev": "cross-env NODE_ENV=test BABEL_ENV=development mocha --require babel-register src/*",
     "test": "NODE_ENV=test mocha --require babel-register src/*",
-    "start": "babel-node src/app.js node",
-    "dev": "nodemon src/app.js --exec babel-node",
-    "prettier": "prettier --single-quote --print-width 80 --trailing-comma all --write 'src/**/*.js'"
+    "start": "cross-env babel-node src/app.js node",
+    "dev": "cross-env nodemon src/app.js --exec babel-node",
+    "prettier": "cross-env prettier --single-quote --print-width 80 --trailing-comma all --write 'src/**/*.js'"
   },
   "author": "Andy Amaya",
   "license": "ISC",
@@ -27,6 +27,7 @@
     "bcrypt": "^1.0.3",
     "body-parser": "^1.18.2",
     "colors": "^1.1.2",
+    "cross-env": "^5.1.0",
     "date-fns": "^1.29.0",
     "express": "^4.16.2",
     "jsonwebtoken": "^8.1.0",

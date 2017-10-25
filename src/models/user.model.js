@@ -2,6 +2,7 @@
 
 import mongoose, { Schema } from 'mongoose';
 import { REGEX } from '../config/constants';
+import bcrypt from 'bcrypt';
 
 const UserSchema = new Schema({
   email: {
@@ -88,6 +89,18 @@ UserSchema.methods.apiGetWorkConfig = function() {
     workDayEndTime: this.workDayEndTime,
     workDays: this.workDays,
     workHoursPerDay: this.workHoursPerDay
+  }
+}
+
+UserSchema.methods.validatePassword = function(password) {
+  return bcrypt.compare(password, this.password)
+}
+
+UserSchema.statics.securePassword = function(password, useSync=false) {
+  if(useSync){
+    return bcrypt.hashSync(password, 10);
+  } else {
+    return bcrypt.hash(password, 10);
   }
 }
 
