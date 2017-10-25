@@ -6,12 +6,7 @@ import express from 'express';
 import { config, constants } from './config';
 import serverHandle from './app/server';
 
-const startServer = () => serverHandle.start();
-const stopServer = () => serverHandle.stop();
-
 const app = express();
-serverHandle.use(app);
-app.use(express.static('src/public'));
 
 const { DEVELOPMENT } = config;
 if (DEVELOPMENT) {
@@ -20,6 +15,12 @@ if (DEVELOPMENT) {
   const morgan = require('morgan');
   app.use(morgan('dev'));
 }
+
+const startServer = () => serverHandle.start();
+const stopServer = () => serverHandle.stop();
+
+serverHandle.use(app);
+app.use(express.static('src/public'));
 
 if (require.main === module) {
   startServer().catch(err => {
