@@ -67,4 +67,4 @@ AppointmentSchema.methods.apiGet = function() {
   }
 }
 
-export default mongoose.model(AppointmentSchema);
+export default mongoose.model('Appointment', AppointmentSchema);
