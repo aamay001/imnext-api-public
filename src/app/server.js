@@ -30,27 +30,27 @@ const start = (database = config.DATABASE_URL) =>
           console.log(constants.SERVER_START_SUCCESS);
           return resolve(_server);
         })
-        .on('error', err => {
-          console.log(constants.SERVER_START_ERROR(err));
+        .on('error', error => {
+          console.log(constants.SERVER_START_ERROR(error));
           mongoose.disconnect();
-          return reject(err);
+          return reject(error);
         });
     });
   });
 
 const stop = () =>
-  mongoose.disconnect().then(
-    () =>
+  mongoose.disconnect()
+    .then(() =>
       new Promise((resolve, reject) => {
-        console.log(constants.SERVER_STOPPING);
-        _server.close(err => {
-          if (err) {
-            console.log(constants.SERVER_STOP_ERROR(err));
-            return reject(err);
-          }
-          return resolve();
-        });
-      }),
+      console.log(constants.SERVER_STOPPING);
+      _server.close(err => {
+        if (err) {
+          console.log(constants.SERVER_STOP_ERROR(err));
+          return reject(err);
+        }
+        return resolve();
+      });
+    }),
   );
 
 module.exports = {

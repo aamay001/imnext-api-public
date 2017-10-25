@@ -7,8 +7,11 @@ const REGEX = {
   EMAIL: '/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:.[a-zA-Z0-9-]+)*$/',
 };
 
+const DATE_FORMAT = 'YYYY-MM-DD';
+
 export default {
   REGEX,
+  DATE_FORMAT,
   SERVER_START_SUCCESS: `Server start success. Server is listening on port ${config.PORT}.`
     .green,
   SERVER_START_ERROR: err => `Server start error. Error: ${err}`.red,
