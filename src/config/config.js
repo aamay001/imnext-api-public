@@ -18,7 +18,7 @@ const CAPTCHA_SITE_KEY = process.env.CAPTCHA_SITE_KEY;
 const CAPTCHA_SECRET = process.env.CAPTCHA_SECRET;
 let MONGOOSE_DB;
 
-export default {
+module.exports = {
   PORT,
   DATABASE_NAME,
   DATABASE_URL,
