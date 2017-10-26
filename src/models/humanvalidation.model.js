@@ -42,4 +42,5 @@ HumanValidationSchema.methods.apiGet = function() {
   }
 }
 
-export default mongoose.model('HumanValidation', HumanValidationSchema);
+const HumanValidation = mongoose.model('HumanValidation', HumanValidationSchema);
+module.exports = {HumanValidation};

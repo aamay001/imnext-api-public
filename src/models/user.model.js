@@ -1,58 +1,63 @@
 'use strict';
 
 import mongoose, { Schema } from 'mongoose';
+import uniqueValidator from 'mongoose-unique-validator';
+import bcrypt from 'bcrypt'
 import { REGEX } from '../config/constants';
-import bcrypt from 'bcrypt';
 
 const UserSchema = new Schema({
   email: {
     type: String,
+    trim: true,
     required: true,
     unique: true,
     validate: {
-      validator: v => REGEX.EMAIL.test(v),
-      message: '{VALUE} is not a valid email address.',
+      validator(email){
+        return REGEX.EMAIL.test(email)
+      } ,
+      message: 'Invalid email address.',
     },
   },
   password: {
     type: String,
     required: true,
+    minlength: 8,
     validate: {
-      validator: v => REGEX.PASSWORD.test(v),
-      message: 'Passsword does not meet complexity requirement.',
-    },
+      validator(password){
+        return REGEX.PASSWORD.test(password);
+      },
+      message: 'Password does not meet complexity requirement.'
+    }
+  },
   mobilePhone: {
     type: String,
     required: true,
     unique: true,
+    minlength: 10,
     validate: {
-      validator: v => REGEX.PHONE.test(v),
-      message: 'Mobile phone is not in a valid format.'
+      validator(mobilePhone){
+        return REGEX.PHONE.test(mobilePhone);
+      },
+      message: 'Invalid mobile phone.'
     }
   },
-  firsName: {
+  firstName: {
     type: String,
     required: true,
-    validate : {
-      validator: v => v.length >= 2 && v.length <= 32,
-      message: 'First name must be between 2 and  32 characters long.'
-    }
+    minlength: 2,
+    maxlength: 32
   },
   lastName: {
     type: String,
     required: true,
-    validate: {
-      validator: v => v.length >= 2 && v.length <= 32,
-      message: 'Last name must be between 2 and  32 characters long.'
-    }
+    minlength: 2,
+    maxlength: 32
   },
   workHoursPerDay: {
     type: Number,
     default: 8,
-    validate: {
-      validator: v => v > 0 && v < 16,
-      message: 'Work hours per day must be between 1 and 16',
-    }
+    min: 0,
+    max: 16
   },
   workDays: {
     type: Array,
@@ -71,24 +76,51 @@ const UserSchema = new Schema({
   },
   workDayEndTime: {
     type: Date
-  }
   },
+  workBreakStartTime: {
+    type: Date
+  },
+  workBreakLengthMinutes: {
+    type: Number,
+    min: 15,
+    max: 120
+  },
+  providerName: {
+    type: String,
+    minlength: 8,
+    maxlength: 64
+  }
+});
+
+UserSchema.plugin(uniqueValidator, {
+  message: '{VALUE} is already taken.'
+});
+
+UserSchema.pre('save', function(next) {
+  if(this.isModified('password')) {
+    this.password = this.securePassword(this.password);
+    return next();
+  }
 });
 
 UserSchema.methods.apiGet = function() {
   return {
-    firsName: this.firsName,
+    firsName: this.firstName,
     lastName: this.lastName,
-    mobilePhone: this.mobilePhone
+    mobilePhone: this.mobilePhone,
+    email: this.email
   }
 }
 
-UserSchema.methods.apiGetWorkConfig = function() {
+UserSchema.methods.apiGetWorkSettings = function() {
   return {
     workDayStartTime: this.workDayStartTime,
     workDayEndTime: this.workDayEndTime,
     workDays: this.workDays,
-    workHoursPerDay: this.workHoursPerDay
+    workHoursPerDay: this.workHoursPerDay,
+    workBreakStartTime: this.workBreakStartTime,
+    workBreakLengthMinutes: this.workBreakLengthMinutes,
+    providerName: this.providerName
   }
 }
 
@@ -96,12 +128,22 @@ UserSchema.methods.validatePassword = function(password) {
   return bcrypt.compare(password, this.password)
 }
 
-UserSchema.statics.securePassword = function(password, useSync=false) {
-  if(useSync){
-    return bcrypt.hashSync(password, 10);
-  } else {
-    return bcrypt.hash(password, 10);
-  }
+UserSchema.methods.securePassword = function(password) {
+  return bcrypt.hashSync(password, 10);
 }
 
-export default mongoose.model('User', UserSchema);
+UserSchema.statics.getRequiredForSettings = function() {
+  return [
+    'workHoursPerDay',
+    'workDays',
+    'workDayStartTime',
+    'workDayEndTime',
+    'workBreakStartTime',
+    'workBreakLengthMinutes',
+    'providerName',
+    'email'
+  ];
+}
+
+const User = mongoose.model('User', UserSchema);
+module.exports = {User};
