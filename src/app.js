@@ -3,27 +3,24 @@
 'use strict';
 
 import express from 'express';
-import { config, constants } from './config';
 import serverHandle from './app/server';
 import routes from './routes/';
+import auth from './service/authentication';
 
 const app = express();
 
-const { DEVELOPMENT } = config;
-if (DEVELOPMENT) {
-  const colors = require('colors');
-  console.info('DEVELOPMENT'.yellow);
-  const morgan = require('morgan');
-  app.use(morgan('dev'));
-}
+require('./utility/dev').init(app);
 
 const startServer = () => serverHandle.start();
 const stopServer = () => serverHandle.stop();
 
 serverHandle.use(app);
 app.use(express.static('src/public'));
+auth.init(app);
 
+// ROUTES
 app.use('/api/user', routes.user);
+app.use('/api/auth', routes.auth);
 
 if (require.main === module) {
   startServer().catch(err => {
@@ -31,4 +28,8 @@ if (require.main === module) {
   });
 }
 
-export { app, startServer, stopServer };
+module.exports = {
+  app,
+  startServer,
+  stopServer
+};

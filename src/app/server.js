@@ -48,6 +48,7 @@ const stop = () =>
           console.log(constants.SERVER_STOP_ERROR(err));
           return reject(err);
         }
+        console.log('Server stopped.');
         return resolve();
       });
     }),

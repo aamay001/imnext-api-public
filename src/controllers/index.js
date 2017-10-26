@@ -2,6 +2,6 @@
 
 import user from './user.controller';
 
-export default  {
+module.exports = {
     user
 }

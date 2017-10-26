@@ -1,13 +1,15 @@
 'use strict';
 
 const chai = require('chai');
+const chaiHttp = require('chai-http');
 const chaiAsPromised = require('chai-as-promised');
 
+chai.use(chaiHttp);
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-const { app, startServer, stopServer } = require('../app');
-const { config, constants } = require('../config');
+const { startServer, stopServer } = require('../app');
+const { config } = require('../config');
 
 describe('Server Start and Stop', () => {
   describe('START', () => {
@@ -15,6 +17,7 @@ describe('Server Start and Stop', () => {
       expect(startServer(config.TEST_DATABASE_URL)).to.be.fulfilled);
   });
   describe('STOP', () => {
-    it('should stop the server', () => expect(stopServer()).to.be.fulfilled);
+    it('should stop the server', () =>
+      expect(stopServer()).to.be.fulfilled);
   });
 });
