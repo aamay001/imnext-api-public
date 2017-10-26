@@ -30,6 +30,13 @@ const createUser = (req, res) => {
 }
 
 const putSettings = (req, res) => {
+  if(req.body.email !== req.user.email) {
+    const response = {
+      message: `User id does not match authentication.`,
+      ok: false
+    };
+    return res.status(409).json(response);
+  }
   const requiredFields = User.getRequiredForSettings();
   for ( let i = 0; i < requiredFields.length; i++) {
     const field = requiredFields[i];
@@ -41,18 +48,14 @@ const putSettings = (req, res) => {
       return res.status(400).json(response);
     }
   }
-  if(req.body.email !== req.user.email) {
-    const response = {
-      message: `User id does not match authentication.`,
-      ok: false
-    };
-    return res.status(409).json(response);
-  }
   User.findOne({email: req.body.email})
-    .then( user =>
-      User.findOneAndUpdate({_id: user._id}, req.body)
-        .then( updatedUser => res.status(202).json(updatedUser.apiGetWorkSettings()))
-    )
+    .then( user => {
+      User.findByIdAndUpdate({_id: user._id}, req.body, {upsert: false, new: true})
+        .then(updatedUser => {
+          console.info(`User settings updated: ${updatedUser.email}`.cyan);
+          return res.status(202).json(updatedUser.apiGetWorkSettings())
+        });
+    })
     .catch(error => res.status(409).json(error));
 }
 
