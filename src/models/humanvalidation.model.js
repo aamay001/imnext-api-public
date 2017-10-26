@@ -17,6 +17,8 @@ const HumanValidationSchema = new Schema({
   validationCode: {
     type: Number,
     required: true,
+    min: 100000000,
+    max: 99999999,
     default: Math.floor(Math.random()*(99999999-10000000+1)+10000000)
   },
   expiration: {
@@ -40,4 +42,5 @@ HumanValidationSchema.methods.apiGet = function() {
   }
 }
 
-export default mongoose.model('HumanValidation', HumanValidationSchema);
+const HumanValidation = mongoose.model('HumanValidation', HumanValidationSchema);
+module.exports = {HumanValidation};
