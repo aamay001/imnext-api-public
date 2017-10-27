@@ -1,7 +1,6 @@
 'use strict';
 
 import reCAPTCHA from 'recaptcha2';
-import differenceInMinutes from 'date-fns/difference_in_minutes';
 import { constants, config } from '../config';
 import { HumanValidation, User} from '../models/';
 import twilio from '../service/twilio';
@@ -13,6 +12,24 @@ const recaptcha = new reCAPTCHA({
   secretKey: config.CAPTCHA_SECRET,
 });
 
+/*
+  Algorithm
+  if production
+    reCAPTCHA
+  else
+    skip reCAPTCHA
+  if reCAPTCHA ok (or skipped)
+    if required fields ok
+    else return 400
+    if existing validation and not expired
+      create new
+      send sms
+      return 202
+    else
+      return 429
+  else
+    return 400 (bad reCAPTCHA)
+*/
 const create = (req, res) => {
   (config.PRODUCTION
     ? recaptcha.validateRequest(req)
@@ -35,30 +52,35 @@ const create = (req, res) => {
         lastName: req.body.lastName,
         mobilePhone: req.body.mobilePhone,
       };
-      return HumanValidation.findOne({mobilePhone: data.mobilePhone, complete: false})
-        .then( existing => {
-          if ( !existing || (existing && differenceInMinutes(new Date(), existing.expiration) > 25) ) {
-            return HumanValidation.create(data)
-              .then(hV => {
-                twilio
-                  .sendSMS(
-                    `imNext Appointment Validation Code: ${hV.validationCode}\nExpires in 30 minutes.`,
-                    data.mobilePhone,
-                  )
-                  .then(() =>
-                    res.status(202).json({
-                      ok: true,
-                      message: 'Human validation created.',
-                    }),
-                  );
-              })
-              .catch(err => res.status(500).json(err));
-          }
-          return res.status(429).json({
-            message: "Validations can only be generated every 25 minutes for same mobile. Use existing validation code first.",
-            ok: true
-          });
-        })
+      const now = new Date();
+      return HumanValidation.findOne({
+        mobilePhone: data.mobilePhone,
+        complete: false,
+        expiration: { $gt: now }
+      })
+      .then( existing => {
+        if ( !existing ) {
+          return HumanValidation.create(data)
+            .then(hV => {
+              twilio
+                .sendSMS(
+                  `imNext Appointment Validation Code: ${hV.validationCode}\nExpires in 30 minutes`,
+                  data.mobilePhone,
+                )
+                .then(() =>
+                  res.status(202).json({
+                    ok: true,
+                    message: 'Human validation created.',
+                  }),
+                );
+            })
+            .catch(err => res.status(500).json(err));
+        }
+        return res.status(429).json({
+          message: "Validations can only be generated every 30 minutes for same mobile. Use existing validation code first.",
+          ok: true
+        });
+      })
     }
     return res.status(400).json({
       message: 'reCAPTCHA validation failed.',

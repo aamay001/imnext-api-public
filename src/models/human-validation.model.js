@@ -50,6 +50,10 @@ const HumanValidationSchema = new Schema({
   activationId: {
     type: String,
   },
+  created: {
+    type: Date,
+    default: new Date()
+  }
 });
 
 HumanValidationSchema.methods.apiGet = function() {

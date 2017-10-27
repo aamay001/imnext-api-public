@@ -20,7 +20,7 @@ function sendSMS(body, to) {
       from: TWILIO_NUMBER, // From a valid Twilio number
     });
   }
-  console.info('Twilio sendSMS() dev stub.'.yellow);
+  console.info(`Twilio :\nTo: ${to}\nMessage: ${body}`.yellow);
   return Promise.resolve({
     sid: 'testok',
   });
