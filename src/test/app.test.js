@@ -17,7 +17,6 @@ describe('Server Start and Stop', () => {
       expect(startServer(config.TEST_DATABASE_URL)).to.be.fulfilled);
   });
   describe('STOP', () => {
-    it('should stop the server', () =>
-      expect(stopServer()).to.be.fulfilled);
+    it('should stop the server', () => expect(stopServer()).to.be.fulfilled);
   });
 });

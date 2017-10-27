@@ -21,6 +21,7 @@ auth.init(app);
 // ROUTES
 app.use('/api/user', routes.user);
 app.use('/api/auth', routes.auth);
+app.use('/api/is-human/', routes.humanValidation);
 
 if (require.main === module) {
   startServer().catch(err => {
@@ -31,5 +32,5 @@ if (require.main === module) {
 module.exports = {
   app,
   startServer,
-  stopServer
+  stopServer,
 };
