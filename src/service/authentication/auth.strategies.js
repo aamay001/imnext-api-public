@@ -1,11 +1,12 @@
 'use strict';
 
-import passport from 'passport';
 import { BasicStrategy } from 'passport-http';
 import { Strategy, ExtractJwt } from 'passport-jwt';
-import { User } from '../../models/';
-import { TOKEN_SECRET } from '../../config/config';
+import models from '../../models/';
+import config from '../../config/config';
 
+const { TOKEN_SECRET } = config;
+const { User } = models;
 const JwtStrategy = Strategy;
 
 const INVALID_LOGIN = {
@@ -45,7 +46,7 @@ const tokenStrategy = new JwtStrategy(
   },
 );
 
-module.exports = {
+export default {
   basicStrategy,
   tokenStrategy,
 };

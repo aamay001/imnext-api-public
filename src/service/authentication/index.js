@@ -3,7 +3,7 @@
 import router from './auth.route';
 import controller from './auth.controller';
 
-module.exports = {
+export default {
   router,
   init: controller.init,
   jwt: controller.jwt,

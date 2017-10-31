@@ -11,5 +11,6 @@ const router = express.Router();
 
 router.post('/', jsonParser, controller.user.create);
 router.put('/settings', jwtAuth, jsonParser, controller.user.updateSettings);
+router.get('/', jwtAuth, jsonParser, controller.user.get);
 
-module.exports = router;
+export default router;

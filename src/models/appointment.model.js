@@ -1,14 +1,19 @@
 'use strict';
 
 import mongoose, { Schema } from 'mongoose';
-import { REGEX, DATE_FORMAT } from '../config/constants';
+import uniqueValidator from 'mongoose-unique-validator';
 import format from 'date-fns/format';
 import User from '../models/user.model';
+import constants from '../config/constants';
+
+const { REGEX, DATE_FORMAT } = constants;
 
 const AppointmentSchema = new Schema({
   user_id: {
+    // Provider ID
     type: String,
     required: true,
+    trim: true,
     validate: {
       validator: v => User.findById(v),
       message: 'Invalid user id.',
@@ -17,45 +22,56 @@ const AppointmentSchema = new Schema({
   firstName: {
     type: String,
     require: true,
+    trim: true,
     validate: {
       validator: v => v.length >= 2 && v.length <= 32,
       message: 'First name must be between 2 and  32 characters long.',
     },
-    lastName: {
-      type: String,
-      required: true,
-      validate: {
-        validator: v => v.length >= 2 && v.length <= 32,
-        message: 'Last name must be between 2 and  32 characters long.',
-      },
-    },
-    mobilePhone: {
-      type: String,
-      required: true,
-      unique: true,
-      validate: {
-        validator: v => REGEX.PHONE.test(v),
-        message: 'Mobile phone is not in a valid format.',
-      },
-    },
-    date: {
-      type: Date,
-      required: true,
-      validate: {
-        validator: v =>
-          format(v, DATE_FORMAT) >= format(new Date(), DATE_FORMAT),
-        message: 'Date is invalid. Date must be present or future.',
-      },
-    },
-    time: {
-      type: Date,
-      required: true,
-    },
-    confirmed: {
-      type: Boolean,
-      default: false,
+  },
+  lastName: {
+    type: String,
+    required: true,
+    trim: true,
+    validate: {
+      validator: v => v.length >= 2 && v.length <= 32,
+      message: 'Last name must be between 2 and  32 characters long.',
     },
   },
+  mobilePhone: {
+    type: String,
+    required: true,
+    trim: true,
+    validate: {
+      validator: v => REGEX.PHONE.test(v),
+      message: 'Mobile phone is not in a valid format.',
+    },
+  },
+  date: {
+    type: Date,
+    required: true,
+    validate: {
+      validator: v => format(v, DATE_FORMAT) >= format(new Date(), DATE_FORMAT),
+      message: 'Date must be present or future.',
+    },
+  },
+  time: {
+    type: Date,
+    required: true,
+  },
+  confirmed: {
+    type: Boolean,
+    default: false,
+  },
+  authorization: {
+    type: String,
+    required: true,
+    trim: true,
+    unique: true,
+  },
+});
+
+AppointmentSchema.plugin(uniqueValidator, {
+  message: 'Invalid authorization.',
 });
 
 AppointmentSchema.methods.apiGet = function() {
@@ -68,5 +84,21 @@ AppointmentSchema.methods.apiGet = function() {
   };
 };
 
-const Appointment = mongoose.model('Appointment', AppointmentSchema);
-module.exports = { Appointment };
+AppointmentSchema.statics = {
+  getRequiredForCreate() {
+    return [
+      'provider',
+      'firstName',
+      'lastName',
+      'mobilePhone',
+      'date',
+      'time',
+      'authorization',
+    ];
+  },
+  getRequiredForGet() {
+    return ['email', 'date'];
+  },
+};
+
+export default mongoose.model('Appointment', AppointmentSchema);

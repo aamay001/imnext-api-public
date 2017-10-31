@@ -3,7 +3,9 @@
 import mongoose, { Schema } from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
 import bcrypt from 'bcrypt';
-import { REGEX } from '../config/constants';
+import constants from '../config/constants';
+
+const { REGEX } = constants;
 
 const UserSchema = new Schema({
   email: {
@@ -21,7 +23,8 @@ const UserSchema = new Schema({
   password: {
     type: String,
     required: true,
-    minlength: 8,
+    trim: true,
+    sensitive: true,
     validate: {
       validator(password) {
         return REGEX.PASSWORD.test(password);
@@ -32,6 +35,7 @@ const UserSchema = new Schema({
   mobilePhone: {
     type: String,
     required: true,
+    trim: true,
     unique: true,
     minlength: 10,
     validate: {
@@ -55,12 +59,6 @@ const UserSchema = new Schema({
     minlength: 2,
     maxlength: 32,
   },
-  workHoursPerDay: {
-    type: Number,
-    default: 8,
-    min: 0,
-    max: 16,
-  },
   workDays: {
     type: Array,
     default: [false, false, false, false, false, false, false],
@@ -74,10 +72,15 @@ const UserSchema = new Schema({
   workBreakStartTime: {
     type: Date,
   },
+  appointmentTime: {
+    type: Number,
+    default: 30,
+  },
   workBreakLengthMinutes: {
     type: Number,
     min: 15,
     max: 120,
+    default: 30,
   },
   providerName: {
     type: String,
@@ -87,12 +90,12 @@ const UserSchema = new Schema({
   },
   activated: {
     type: Boolean,
-    default: false
+    default: false,
   },
   created: {
     type: Date,
-    default: new Date()
-  }
+    default: new Date(),
+  },
 });
 
 UserSchema.plugin(uniqueValidator, {
@@ -106,25 +109,32 @@ UserSchema.pre('save', function(next) {
   }
 });
 
-UserSchema.methods.apiGet = function() {
-  return {
-    firsName: this.firstName,
-    lastName: this.lastName,
-    mobilePhone: this.mobilePhone,
-    email: this.email,
-  };
-};
+UserSchema.methods = {
+  apiGet() {
+    return {
+      firsName: this.firstName,
+      lastName: this.lastName,
+      mobilePhone: this.mobilePhone,
+      email: this.email,
+      workDayStartTime: this.workDayStartTime,
+      workDayEndTime: this.workDayEndTime,
+      workDays: this.workDays,
+      workBreakStartTime: this.workBreakStartTime,
+      workBreakLengthMinutes: this.workBreakLengthMinutes,
+      appointmentTime: this.appointmentTime,
+      providerName: this.providerName,
+    };
+  },
 
-UserSchema.methods.apiGetWorkSettings = function() {
-  return {
-    workDayStartTime: this.workDayStartTime,
-    workDayEndTime: this.workDayEndTime,
-    workDays: this.workDays,
-    workHoursPerDay: this.workHoursPerDay,
-    workBreakStartTime: this.workBreakStartTime,
-    workBreakLengthMinutes: this.workBreakLengthMinutes,
-    providerName: this.providerName,
-  };
+  apiGetProvider() {
+    return {
+      providerName: this.providerName,
+      providerId: this._id,
+      workDays: this.workDays,
+      workDayStartTime: this.workDayStartTime,
+      workDayEndTime: this.workDayEndTime,
+    };
+  },
 };
 
 UserSchema.methods.validatePassword = function(password) {
@@ -135,22 +145,23 @@ UserSchema.methods.securePassword = function(password) {
   return bcrypt.hashSync(password, 10);
 };
 
-UserSchema.statics.getRequiredForCreate = function() {
-  return ['firstName', 'lastName', 'email', 'mobilePhone', 'password'];
+UserSchema.statics = {
+  getRequiredForCreate() {
+    return ['firstName', 'lastName', 'email', 'mobilePhone', 'password'];
+  },
+
+  getRequiredForSettings() {
+    return [
+      'workDays',
+      'workDayStartTime',
+      'workDayEndTime',
+      'workBreakStartTime',
+      'workBreakLengthMinutes',
+      'providerName',
+      'appointmentTime',
+      'email',
+    ];
+  },
 };
 
-UserSchema.statics.getRequiredForSettings = function() {
-  return [
-    'workHoursPerDay',
-    'workDays',
-    'workDayStartTime',
-    'workDayEndTime',
-    'workBreakStartTime',
-    'workBreakLengthMinutes',
-    'providerName',
-    'email',
-  ];
-};
-
-const User = mongoose.model('User', UserSchema);
-module.exports = { User };
+export default mongoose.model('User', UserSchema);

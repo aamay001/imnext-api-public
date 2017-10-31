@@ -1,35 +1,20 @@
+/* eslint-disable no-console */
 'use strict';
 
 import reCAPTCHA from 'recaptcha2';
-import { constants, config } from '../config';
-import { HumanValidation, User} from '../models/';
+import settings from '../config';
+import models from '../models/';
 import twilio from '../service/twilio';
 
 twilio.init();
 
+const { constants, config } = settings;
+const { HumanValidation, User } = models;
 const recaptcha = new reCAPTCHA({
   siteKey: config.CAPTCHA_SITE_KEY,
   secretKey: config.CAPTCHA_SECRET,
 });
 
-/*
-  Algorithm
-  if production
-    reCAPTCHA
-  else
-    skip reCAPTCHA
-  if reCAPTCHA ok (or skipped)
-    if required fields ok
-    else return 400
-    if existing validation and not expired
-      create new
-      send sms
-      return 202
-    else
-      return 429
-  else
-    return 400 (bad reCAPTCHA)
-*/
 const create = (req, res) => {
   (config.PRODUCTION
     ? recaptcha.validateRequest(req)
@@ -40,11 +25,9 @@ const create = (req, res) => {
       for (let i = 0; i < requiredFields.length; i++) {
         const field = requiredFields[i];
         if (!(field in req.body)) {
-          const message = {
-            ok: false,
-            message: `Missing ${field} in request body.`,
-          };
-          return res.status(400).json(message);
+          return res.status(400).json({
+            message: constants.MISSING_FIELD(field),
+          });
         }
       }
       const data = {
@@ -56,54 +39,148 @@ const create = (req, res) => {
       return HumanValidation.findOne({
         mobilePhone: data.mobilePhone,
         complete: false,
-        expiration: { $gt: now }
-      })
-      .then( existing => {
-        if ( !existing ) {
+        expiration: { $gt: now },
+        type: 'APPOINTMENT',
+      }).then(existing => {
+        if (!existing) {
           return HumanValidation.create(data)
             .then(hV => {
               twilio
                 .sendSMS(
-                  `imNext Appointment Validation Code: ${hV.validationCode}\nExpires in 30 minutes`,
-                  data.mobilePhone,
+                  constants.APPOINTMENT_VALIDATION_SMS(hV.validationCode),
+                  hV.mobilePhone,
                 )
                 .then(() =>
-                  res.status(202).json({
-                    ok: true,
-                    message: 'Human validation created.',
+                  res.status(201).json({
+                    message: constants.VALIDATION_CREATED,
                   }),
                 );
             })
             .catch(err => res.status(500).json(err));
         }
         return res.status(429).json({
-          message: "Validations can only be generated every 30 minutes for same mobile. Use existing validation code first.",
-          ok: true
+          message: constants.VALIDATION_EXISTS,
         });
-      })
+      });
     }
     return res.status(400).json({
-      message: 'reCAPTCHA validation failed.',
-      ok: false,
+      message: constants.RECAPTCHA_FAILED,
     });
   });
 };
 
 const activate = (req, res) => {
-  if(req.body.mobilePhone !== req.user.mobilePhone) {
-    const response = {
-      message: `Mobile phone does not match authentication.`,
-      ok: false,
-    };
-    return res.status(409).json(response);
+  const requiredFields = HumanValidation.getRequiredForActivation();
+  for (let i = 0; i < requiredFields.length; i++) {
+    const field = requiredFields[i];
+    if (!(field in req.body)) {
+      return res.status(400).json({
+        message: constants.MISSING_FIELD(field),
+      });
+    }
   }
+  if (req.body.email !== req.user.email) {
+    return res.status(400).json({
+      message: constants.EMAIL_AUTH_MISMATCH,
+    });
+  }
+  if (req.body.mobilePhone !== req.user.mobilePhone) {
+    return res.status(400).json({
+      message: constants.MOBILE_AUTH_MISMATCH,
+    });
+  }
+  const now = new Date();
+  return HumanValidation.findOneAndUpdate(
+    {
+      mobilePhone: req.body.mobilePhone,
+      complete: false,
+      validationCode: req.body.validationCode,
+      expiration: { $gt: now },
+      type: 'ACTIVATION',
+    },
+    {
+      complete: true,
+      completedOn: now,
+    },
+    {
+      upsert: false,
+      new: true,
+    },
+  )
+    .then(validation => {
+      if (validation) {
+        return User.findOneAndUpdate(
+          { email: req.body.email },
+          { activated: true },
+          {
+            upsert: false,
+            new: true,
+          },
+        ).then(updatedUser => {
+          console.info(`User account activated: ${updatedUser.email}`.cyan);
+          return res.status(202).json({
+            message: constants.ACCOUNT_ACTIVATED,
+          });
+        });
+      }
+      return res.status(200).json({
+        message: constants.ACCOUNT_ACTIVATION_FAILED,
+      });
+    })
+    .catch(() =>
+      res.status(400).json({
+        messaga: constants.VALIDATION_INVALID,
+      }),
+    );
 };
 
 const validate = (req, res) => {
+  const requiredFields = HumanValidation.getRequiredForValidation();
+  for (let i = 0; i < requiredFields.length; i++) {
+    const field = requiredFields[i];
+    if (!(field in req.body)) {
+      return res.status(400).json({
+        message: constants.MISSING_FIELD(field),
+      });
+    }
+  }
+  const now = new Date();
+  return HumanValidation.findOneAndUpdate(
+    {
+      mobilePhone: req.body.mobilePhone,
+      complete: false,
+      validationCode: req.body.validationCode,
+      expiration: { $gt: now },
+      type: 'APPOINTMENT',
+    },
+    {
+      complete: true,
+      completedOn: now,
+    },
+    {
+      upsert: false,
+      new: true,
+    },
+  )
+    .then(validation => {
+      if (validation) {
+        return res.status(202).json({
+          message: constants.VALIDATION_SUCCESS,
+          authorization: validation._id,
+        });
+      }
+      return res.status(409).json({
+        message: constants.VALIDATION_FAILED,
+      });
+    })
+    .catch(() =>
+      res.status(500).json({
+        messaga: constants.INTERNAL_SERVER_ERROR,
+      }),
+    );
+};
 
-}
-
-module.exports = {
+export default {
   create,
   activate,
   validate,

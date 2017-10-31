@@ -1,8 +1,10 @@
+/* eslint-disable no-console */
 'use strict';
 
 import twilio from 'twilio';
-import { config } from '../../config';
+import settings from '../../config';
 
+const config = settings.config;
 const { TWILIO_ACCOUNT, TWILIO_TOKEN, TWILIO_NUMBER } = config;
 let client;
 
@@ -26,7 +28,7 @@ function sendSMS(body, to) {
   });
 }
 
-module.exports = {
+export default {
   init,
   sendSMS,
 };
