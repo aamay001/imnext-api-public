@@ -67,7 +67,11 @@ const create = (req, res) => {
         message: constants.RECAPTCHA_FAILED,
       });
     }
-  });
+  })
+  .catch( () => res.status(400).json({
+      message: constants.RECAPTCHA_FAILED
+    })
+  );
 };
 
 const get = (req, res) => {

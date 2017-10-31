@@ -9,7 +9,6 @@ import routes from './routes/';
 import auth from './service/authentication';
 import settings from './config';
 
-
 const app = express();
 app.use(
   cors({

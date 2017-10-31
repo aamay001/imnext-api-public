@@ -105,7 +105,11 @@ const create = (req, res) => {
     return res.staus(400).json({
       message: constants.RECAPTCHA_FAILED,
     });
-  });
+  })
+  .catch( () => res.status(400).json({
+      message: constants.RECAPTCHA_FAILED
+    })
+  );
 };
 
 const getAppointments = (req, res) => {
