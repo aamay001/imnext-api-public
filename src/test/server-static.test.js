@@ -2,8 +2,8 @@
 
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import {startServer, stopServer, app} from '../app';
-import config from '../config/'
+import { startServer, stopServer, app } from '../app';
+import config from '../config/';
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -14,9 +14,11 @@ describe('STATIC, SERVE', () => {
   after(() => stopServer());
 
   describe('index.html', () => {
-    it('should serve the static index.html file', () => chai.request(app)
+    it('should serve the static index.html file', () =>
+      chai
+        .request(app)
         .get('/')
-        .then( res => {
+        .then(res => {
           expect(res.status).to.equal(200);
           expect(res.type).to.equal('text/html');
         }));

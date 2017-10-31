@@ -7,5 +7,5 @@ module.exports = {
   router,
   init: controller.init,
   jwt: controller.jwt,
-  basic: controller.basic
+  basic: controller.basic,
 };

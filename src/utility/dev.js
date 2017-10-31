@@ -8,9 +8,9 @@ const init = app => {
     const morgan = require('morgan');
     app.use(morgan('dev'));
   }
-}
+};
 
 module.exports = {
   init,
-  DEVELOPMENT
+  DEVELOPMENT,
 };

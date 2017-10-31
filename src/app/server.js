@@ -39,19 +39,19 @@ const start = (database = config.DATABASE_URL) =>
   });
 
 const stop = () =>
-  mongoose.disconnect()
-    .then(() =>
+  mongoose.disconnect().then(
+    () =>
       new Promise((resolve, reject) => {
-      console.log(constants.SERVER_STOPPING);
-      _server.close(err => {
-        if (err) {
-          console.log(constants.SERVER_STOP_ERROR(err));
-          return reject(err);
-        }
-        console.log('Server stopped.');
-        return resolve();
-      });
-    }),
+        console.log(constants.SERVER_STOPPING);
+        _server.close(err => {
+          if (err) {
+            console.log(constants.SERVER_STOP_ERROR(err));
+            return reject(err);
+          }
+          console.log('Server stopped.');
+          return resolve();
+        });
+      }),
   );
 
 module.exports = {
