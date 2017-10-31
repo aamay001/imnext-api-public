@@ -17,6 +17,7 @@ const TWILIO_NUMBER = process.env.TWILIO_NUMBER;
 const TEST_CONFIRM_NUMBER = process.env.TEST_CONFIRM_NUMBER;
 const CAPTCHA_SITE_KEY = process.env.CAPTCHA_SITE_KEY;
 const CAPTCHA_SECRET = process.env.CAPTCHA_SECRET;
+const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || 'localhost';
 let MONGOOSE_DB;
 
 console.log(
@@ -42,4 +43,5 @@ module.exports = {
   CAPTCHA_SECRET,
   CAPTCHA_SITE_KEY,
   MONGOOSE_DB,
+  CLIENT_ORIGIN
 };
