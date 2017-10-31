@@ -228,6 +228,11 @@ const getAvailable = (req, res) => {
               }
             }
           }
+          if (availbleTimeSlots.length === 0) {
+            return res.status(200).json({
+              message: 'No time slots available.',
+            });
+          }
           return res.status(200).json(availbleTimeSlots);
         });
       }
