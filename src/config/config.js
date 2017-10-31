@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 'use strict';
 
 const PORT = process.env.PORT || 8080;
@@ -18,8 +19,12 @@ const CAPTCHA_SITE_KEY = process.env.CAPTCHA_SITE_KEY;
 const CAPTCHA_SECRET = process.env.CAPTCHA_SECRET;
 let MONGOOSE_DB;
 
-console.log( `NODE ENV: ${(DEVELOPMENT ? "DEVELOPMENT" : PRODUCTION ? "PRODUCTION" : "OTHER")}`);
-console.log( `BABEL ENV: ${process.env.BABEL_ENV.toUpperCase()}`);
+console.log(
+  `NODE ENV: ${DEVELOPMENT
+    ? 'DEVELOPMENT'
+    : PRODUCTION ? 'PRODUCTION' : 'OTHER'}`,
+);
+console.log(`BABEL ENV: ${process.env.BABEL_ENV.toUpperCase()}`);
 
 module.exports = {
   PORT,

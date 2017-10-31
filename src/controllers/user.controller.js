@@ -1,9 +1,14 @@
+/* eslint-disable no-console */
 'use strict';
 
 import reCAPTCHA from 'recaptcha2';
-import { constants, config } from '../config';
-import { User, HumanValidation } from '../models/';
+import settings from '../config';
+import models from '../models/';
 import twilio from '../service/twilio';
+
+const User = models.User;
+const HumanValidation = models.HumanValidation;
+const { constants, config } = settings;
 
 twilio.init();
 
@@ -22,11 +27,9 @@ const create = (req, res) => {
       for (let i = 0; i < requiredFields.length; i++) {
         const field = requiredFields[i];
         if (!(field in req.body)) {
-          const response = {
-            message: `Missing ${field} in request body.`,
-            ok: false,
-          };
-          return res.status(400).json(response);
+          return res.status(400).json({
+            message: constants.MISSING_FIELD(field),
+          });
         }
       }
       const body = req.body;
@@ -41,53 +44,71 @@ const create = (req, res) => {
             type: 'ACTIVATION',
             activationId: newUser._id.toString(),
           };
-          return HumanValidation.create(humanValidation).then( hV => twilio.sendSMS(
-              `imNext Account Activation Code: ${hV.validationCode}\nExpired in 30 minutes.`,
-              humanValidation.mobilePhone
-            )
-            .then(() =>
-              res.status(201).json({
-                message: constants.USER_CREATE_SUCCESS,
-                ok: true,
-              })
-            ));
+          return HumanValidation.create(humanValidation).then(hV =>
+            twilio
+              .sendSMS(
+                constants.ACCOUNT_ACTIVATION_SMS(hV.validationCode),
+                humanValidation.mobilePhone,
+              )
+              .then(() =>
+                res.status(201).json({
+                  message: constants.USER_CREATE_SUCCESS,
+                }),
+              ),
+          );
         })
-        .catch(error => res.status(400).json(error));
+        .catch(error =>
+          res.status(400).json({
+            message: error.message,
+          }),
+        );
     } else {
       return res.status(400).json({
-        message: 'reCAPTCHA validation failed.',
-        ok: false,
+        message: constants.RECAPTCHA_FAILED,
       });
     }
   });
 };
 
+const get = (req, res) => {
+  User.findOne({ email: req.user.email })
+    .then(user => {
+      if (user) {
+        return res.status(200).json(user.apiGet());
+      }
+      return res.status(404).json({
+        message: constants.USER_NOT_FOUND,
+      });
+    })
+    .catch(error => {
+      console.error(error.red);
+      return res.send(500).json({
+        message: constants.INTERNAL_SERVER_ERROR,
+      });
+    });
+};
+
 const updateSettings = (req, res) => {
-  if (req.body.email !== req.user.email) {
-    const response = {
-      message: `User id does not match authentication.`,
-      ok: false,
-    };
-    return res.status(409).json(response);
-  }
   const requiredFields = User.getRequiredForSettings();
   for (let i = 0; i < requiredFields.length; i++) {
     const field = requiredFields[i];
     if (!(field in req.body)) {
-      const response = {
-        message: `Missing ${field} in request body.`,
-        ok: false,
-      };
-      return res.status(400).json(response);
+      return res.status(400).json({
+        message: constants.MISSING_FIELD(field),
+      });
     }
+  }
+  if (req.body.email !== req.user.email) {
+    return res.status(400).json({
+      message: constants.EMAIL_AUTH_MISMATCH,
+    });
   }
   User.findOne({ email: req.body.email })
     .then(user => {
-      if(user) {
+      if (user) {
         if (!user.activated) {
           return res.status(403).json({
-            message: "User account is not activated",
-            ok: false
+            message: constants.USER_ACCOUNT_NOT_ACTIVATED,
           });
         }
         const updateData = {
@@ -104,19 +125,27 @@ const updateSettings = (req, res) => {
           new: true,
         }).then(updatedUser => {
           console.info(`User settings updated: ${updatedUser.email}`.cyan);
-          return res.status(202).json(updatedUser.apiGetWorkSettings());
+          return res.status(202).json(updatedUser.apiGet());
         });
       } else {
         return res.status(404).json({
-          message: "User not found.",
-          ok: false
+          message: constants.USER_NOT_FOUND,
         });
       }
     })
     .catch(error => res.status(409).json(error));
 };
 
-module.exports = {
+const getProviders = (req, res) => {
+  User.find({}).then(users => {
+    const providers = users.map(u => u.apiGetProvider());
+    return res.status(200).json(providers);
+  });
+};
+
+export default {
   create,
+  get,
+  getProviders,
   updateSettings,
 };

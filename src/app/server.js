@@ -2,8 +2,9 @@
 'use strict';
 
 import mongoose from 'mongoose';
-import { config, constants } from '../config';
+import settings from '../config';
 
+const { config, constants } = settings;
 mongoose.Promise = global.Promise;
 
 let _app;
@@ -54,7 +55,7 @@ const stop = () =>
       }),
   );
 
-module.exports = {
+export default {
   start,
   stop,
   use,

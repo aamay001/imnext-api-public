@@ -2,20 +2,20 @@
 
 import express from 'express';
 import bodyParser from 'body-parser';
-import controller from '../controllers/';
+import controllers from '../controllers/';
 import authService from '../service/authentication';
 
 const jwtAuth = authService.jwt;
 const jsonParser = bodyParser.json();
 const router = express.Router();
 
-router.post('/', jsonParser, controller.humanValidation.create);
-router.put(
-  '/activate',
+router.post('/', jsonParser, controllers.appointment.create);
+router.get('/available', jsonParser, controllers.appointment.getAvailable);
+router.get(
+  '/provider',
   jwtAuth,
   jsonParser,
-  controller.humanValidation.activate,
+  controllers.appointment.getAppointments,
 );
-router.put('/validate', jsonParser, controller.humanValidation.validate);
 
 export default router;

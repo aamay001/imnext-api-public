@@ -1,10 +1,10 @@
 'use strict';
 
-import { User } from './user.model';
-import { Appointment } from './appointment.model';
-import { HumanValidation } from './human-validation.model';
+import User from './user.model';
+import Appointment from './appointment.model';
+import HumanValidation from './human-validation.model';
 
-module.exports = {
+export default {
   User,
   Appointment,
   HumanValidation,

@@ -1,6 +1,6 @@
-import { config } from '../config';
+import settings from '../config';
 
-const { DEVELOPMENT } = config;
+const { DEVELOPMENT } = settings.config;
 const init = app => {
   if (DEVELOPMENT) {
     const colors = require('colors');

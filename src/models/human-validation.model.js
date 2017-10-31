@@ -2,7 +2,9 @@
 
 import mongoose, { Schema } from 'mongoose';
 import addMinutes from 'date-fns/add_minutes';
-import { REGEX } from '../config/constants';
+import constants from '../config/constants';
+
+const { REGEX } = constants;
 
 const HumanValidationSchema = new Schema({
   firstName: {
@@ -22,6 +24,7 @@ const HumanValidationSchema = new Schema({
   mobilePhone: {
     type: String,
     required: true,
+    trim: true,
     validate: {
       validator: v => REGEX.PHONE.test(v),
       message: 'Mobile phone is not in a valid format.',
@@ -47,36 +50,28 @@ const HumanValidationSchema = new Schema({
     required: true,
     default: 'APPOINTMENT',
   },
-  activationId: {
-    type: String,
+  created: {
+    type: Date,
+    default: new Date(),
+  },
+  completedOn: {
+    type: Date,
+    default: null,
   },
 });
 
-HumanValidationSchema.methods.apiGet = function() {
-  return {
-    mobilePhone: this.mobilePhone,
-    code: this.validationCode,
-    expiration: this.expiration,
-    complete: this.complete,
-  };
+HumanValidationSchema.statics = {
+  getRequiredForCreate() {
+    return ['firstName', 'lastName', 'mobilePhone'];
+  },
+
+  getRequiredForActivation() {
+    return ['mobilePhone', 'email', 'validationCode'];
+  },
+
+  getRequiredForValidation() {
+    return ['mobilePhone', 'validationCode'];
+  },
 };
 
-HumanValidationSchema.statics.getRequiredForCreate = function() {
-  return ['firstName', 'lastName', 'mobilePhone'];
-};
-
-HumanValidationSchema.statics.getRequiredForActivation = function () {
-  return [
-    'firstName',
-    'lastName',
-    'mobilePhone',
-    'email',
-    'validationCode'
-  ];
-}
-
-const HumanValidation = mongoose.model(
-  'HumanValidation',
-  HumanValidationSchema,
-);
-module.exports = { HumanValidation };
+export default mongoose.model('HumanValidation', HumanValidationSchema);

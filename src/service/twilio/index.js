@@ -1,8 +1,10 @@
+/* eslint-disable no-console */
 'use strict';
 
 import twilio from 'twilio';
-import { config } from '../../config';
+import settings from '../../config';
 
+const config = settings.config;
 const { TWILIO_ACCOUNT, TWILIO_TOKEN, TWILIO_NUMBER } = config;
 let client;
 
@@ -20,13 +22,13 @@ function sendSMS(body, to) {
       from: TWILIO_NUMBER, // From a valid Twilio number
     });
   }
-  console.info('Twilio sendSMS() dev stub.'.yellow);
+  console.info(`Twilio :\nTo: ${to}\nMessage: ${body}`.yellow);
   return Promise.resolve({
     sid: 'testok',
   });
 }
 
-module.exports = {
+export default {
   init,
   sendSMS,
 };
