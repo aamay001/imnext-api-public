@@ -3,7 +3,9 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { startServer, stopServer, app } from '../app';
-import config from '../config/';
+import settings from '../config/';
+
+const {config} = settings;
 
 chai.use(chaiHttp);
 const expect = chai.expect;
