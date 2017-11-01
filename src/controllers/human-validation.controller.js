@@ -153,8 +153,8 @@ const validate = (req, res) => {
     {
       mobilePhone: req.body.mobilePhone,
       complete: false,
-      validationCode: req.body.validationCode,
-      expiration: { $gt: now },
+      validationCode: parseInt(req.body.validationCode, 10),
+      expiration: { $gte: now },
       type: 'APPOINTMENT',
     },
     {
@@ -165,23 +165,23 @@ const validate = (req, res) => {
       upsert: false,
       new: true,
     },
-  )
-    .then(validation => {
-      if (validation) {
-        return res.status(202).json({
-          message: constants.VALIDATION_SUCCESS,
-          authorization: validation._id,
-        });
-      }
-      return res.status(409).json({
-        message: constants.VALIDATION_FAILED,
+  ).then(validation => {
+    if (validation) {
+      return res.status(202).json({
+        message: constants.VALIDATION_SUCCESS,
+        authorization: validation._id,
       });
-    })
-    .catch(() =>
-      res.status(500).json({
-        messaga: constants.INTERNAL_SERVER_ERROR,
-      }),
-    );
+    }
+    console.log(validation);
+    return res.status(409).json({
+      message: constants.VALIDATION_FAILED,
+    });
+  })
+  .catch(() =>
+    res.status(500).json({
+      messaga: constants.INTERNAL_SERVER_ERROR,
+    }),
+  );
 };
 
 export default {

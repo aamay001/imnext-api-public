@@ -141,7 +141,7 @@ const getAppointments = (req, res) => {
         }).then(apps => {
           const appointmentsMap = new Map();
           apps.forEach(_app => {
-            const date = format(_app.date);
+            const date = format(_app.date, constants.DATE_FORMAT);
             const mapItem = appointmentsMap.get(date);
             if (mapItem) {
               mapItem.push(_app.apiGet());

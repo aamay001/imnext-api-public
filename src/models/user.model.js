@@ -126,6 +126,12 @@ UserSchema.methods = {
     };
   },
 
+  apiGetJwtPayload() {
+    return {
+      email: this.email
+    }
+  },
+
   apiGetProvider() {
     return {
       providerName: this.providerName,

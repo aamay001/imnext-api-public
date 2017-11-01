@@ -42,7 +42,14 @@ const tokenStrategy = new JwtStrategy(
     algorithms: ['HS256'],
   },
   (payload, done) => {
-    done(null, payload.user);
+    User.findOne({ email: payload.user.email })
+    .then(_user => {
+      if (!_user) {
+        done(_user, null);
+      }
+      done(null, _user);
+    })
+    .catch(err => done(err, false));
   },
 );
 
