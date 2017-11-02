@@ -52,5 +52,5 @@ export default {
   USER_ACCOUNT_NOT_ACTIVATED: 'User account is not activated',
   APPOINTMENT_DATETIME_UNAVAIL:
     'The appointment date and time is no longer available.',
-  APPOINTMENT_CREATED: 'Appointment was scheduled!',
+  APPOINTMENT_CREATED: 'Appointment scheduled!',
 };

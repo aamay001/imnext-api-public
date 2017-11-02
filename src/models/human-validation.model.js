@@ -34,7 +34,7 @@ const HumanValidationSchema = new Schema({
     type: Number,
     min: 10000000,
     max: 99999999,
-    default: Math.floor(Math.random() * (99999999 - 10000000 + 1) + 10000000),
+    required: true,
   },
   expiration: {
     type: Date,

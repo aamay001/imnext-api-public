@@ -43,13 +43,13 @@ const tokenStrategy = new JwtStrategy(
   },
   (payload, done) => {
     User.findOne({ email: payload.user.email })
-    .then(_user => {
-      if (!_user) {
-        done(_user, null);
-      }
-      done(null, _user);
-    })
-    .catch(err => done(err, false));
+      .then(_user => {
+        if (!_user) {
+          done(_user, null);
+        }
+        done(null, _user);
+      })
+      .catch(err => done(err, false));
   },
 );
 

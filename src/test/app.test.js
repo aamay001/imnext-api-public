@@ -9,7 +9,7 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 
 const { startServer, stopServer } = require('../app');
-const config = require('../config/config')
+const config = require('../config/config');
 
 describe('Server Start and Stop', () => {
   describe('START', () => {

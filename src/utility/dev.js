@@ -7,6 +7,8 @@ const init = app => {
     console.info('DEVELOPMENT'.yellow);
     const morgan = require('morgan');
     app.use(morgan('dev'));
+    console.log(`SITE KEY: ${settings.config.CAPTCHA_SITE_KEY}`);
+    console.log(`SECRET KEY: ${settings.config.CAPTCHA_SECRET}`);
   }
 };
 

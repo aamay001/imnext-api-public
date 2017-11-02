@@ -19,58 +19,63 @@ const create = (req, res) => {
   (config.PRODUCTION
     ? recaptcha.validateRequest(req)
     : new Promise(resolve => resolve(true))
-  ).then(captchaOk => {
-    if (captchaOk) {
-      const requiredFields = HumanValidation.getRequiredForCreate();
-      for (let i = 0; i < requiredFields.length; i++) {
-        const field = requiredFields[i];
-        if (!(field in req.body)) {
-          return res.status(400).json({
-            message: constants.MISSING_FIELD(field),
+  )
+    .then(captchaOk => {
+      if (captchaOk) {
+        const requiredFields = HumanValidation.getRequiredForCreate();
+        for (let i = 0; i < requiredFields.length; i++) {
+          const field = requiredFields[i];
+          if (!(field in req.body)) {
+            return res.status(400).json({
+              message: constants.MISSING_FIELD(field),
+            });
+          }
+        }
+        const data = {
+          firstName: req.body.firstName,
+          lastName: req.body.lastName,
+          mobilePhone: req.body.mobilePhone,
+          validationCode: Math.floor(
+            Math.random() * (99999999 - 10000000 + 1) + 10000000,
+          ),
+        };
+        const now = new Date();
+        return HumanValidation.findOne({
+          mobilePhone: data.mobilePhone,
+          complete: false,
+          expiration: { $gt: now },
+          type: 'APPOINTMENT',
+        }).then(existing => {
+          if (!existing) {
+            return HumanValidation.create(data)
+              .then(hV => {
+                twilio
+                  .sendSMS(
+                    constants.APPOINTMENT_VALIDATION_SMS(hV.validationCode),
+                    hV.mobilePhone,
+                  )
+                  .then(() =>
+                    res.status(201).json({
+                      message: constants.VALIDATION_CREATED,
+                    }),
+                  );
+              })
+              .catch(err => res.status(500).json(err));
+          }
+          return res.status(429).json({
+            message: constants.VALIDATION_EXISTS,
           });
-        }
-      }
-      const data = {
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        mobilePhone: req.body.mobilePhone,
-      };
-      const now = new Date();
-      return HumanValidation.findOne({
-        mobilePhone: data.mobilePhone,
-        complete: false,
-        expiration: { $gt: now },
-        type: 'APPOINTMENT',
-      }).then(existing => {
-        if (!existing) {
-          return HumanValidation.create(data)
-            .then(hV => {
-              twilio
-                .sendSMS(
-                  constants.APPOINTMENT_VALIDATION_SMS(hV.validationCode),
-                  hV.mobilePhone,
-                )
-                .then(() =>
-                  res.status(201).json({
-                    message: constants.VALIDATION_CREATED,
-                  }),
-                );
-            })
-            .catch(err => res.status(500).json(err));
-        }
-        return res.status(429).json({
-          message: constants.VALIDATION_EXISTS,
         });
+      }
+      return res.status(400).json({
+        message: constants.RECAPTCHA_FAILED,
       });
-    }
-    return res.status(400).json({
-      message: constants.RECAPTCHA_FAILED,
-    });
-  })
-  .catch( () => res.status(400).json({
-      message: constants.RECAPTCHA_FAILED
     })
-  );
+    .catch(() =>
+      res.status(400).json({
+        message: constants.RECAPTCHA_FAILED,
+      }),
+    );
 };
 
 const activate = (req, res) => {
@@ -165,23 +170,24 @@ const validate = (req, res) => {
       upsert: false,
       new: true,
     },
-  ).then(validation => {
-    if (validation) {
-      return res.status(202).json({
-        message: constants.VALIDATION_SUCCESS,
-        authorization: validation._id,
+  )
+    .then(validation => {
+      if (validation) {
+        return res.status(202).json({
+          message: constants.VALIDATION_SUCCESS,
+          authorization: validation._id,
+        });
+      }
+      console.log(validation);
+      return res.status(409).json({
+        message: constants.VALIDATION_FAILED,
       });
-    }
-    console.log(validation);
-    return res.status(409).json({
-      message: constants.VALIDATION_FAILED,
-    });
-  })
-  .catch(() =>
-    res.status(500).json({
-      messaga: constants.INTERNAL_SERVER_ERROR,
-    }),
-  );
+    })
+    .catch(() =>
+      res.status(500).json({
+        messaga: constants.INTERNAL_SERVER_ERROR,
+      }),
+    );
 };
 
 export default {

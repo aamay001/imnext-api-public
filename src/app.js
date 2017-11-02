@@ -12,8 +12,8 @@ import settings from './config';
 const app = express();
 app.use(
   cors({
-    origin: settings.config.CLIENT_ORIGIN
-  })
+    origin: settings.config.CLIENT_ORIGIN,
+  }),
 );
 
 require('./utility/dev').init(app);

@@ -14,7 +14,7 @@ router.post('/login', auth.basic, (req, res) => {
   console.info(`User authenticated: ${req.user.email}`.cyan);
   return res.status(200).json({
     authToken,
-    user: {...req.user.apiGet()}
+    user: { ...req.user.apiGet() },
   });
 });
 
@@ -26,7 +26,7 @@ router.post('/refresh', auth.jwt, (req, res) => {
   console.info(`Token refresh: ${req.user.email}`.cyan);
   return res.status(200).json({
     authToken,
-    user : {...req.user.apiGet()}
+    user: { ...req.user.apiGet() },
   });
 });
 

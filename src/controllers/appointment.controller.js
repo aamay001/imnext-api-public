@@ -1,6 +1,5 @@
 'use strict';
 
-import reCAPTCHA from 'recaptcha2';
 import format from 'date-fns/format';
 import isBefore from 'date-fns/is_before';
 import addMinutes from 'date-fns/add_minutes';
@@ -8,108 +7,92 @@ import parse from 'date-fns/parse';
 import isWithinRange from 'date-fns/is_within_range';
 import startOfDay from 'date-fns/start_of_day';
 import endOfDay from 'date-fns/end_of_day';
+import isAfter from 'date-fns/is_after';
 import isEqual from 'date-fns/is_equal';
 import settings from '../config';
 import models from '../models/';
 
 const { Appointment, HumanValidation, User } = models;
-const { constants, config } = settings;
-const recaptcha = new reCAPTCHA({
-  siteKey: config.CAPTCHA_SITE_KEY,
-  secretKey: config.CAPTCHA_SECRET,
-});
+const { constants } = settings;
 
 const create = (req, res) => {
-  (config.PRODUCTION
-    ? recaptcha.validateRequest(req)
-    : new Promise(resolve => resolve(true))
-  ).then(captchaOk => {
-    if (captchaOk) {
-      const requiredFields = Appointment.getRequiredForCreate();
-      for (let i = 0; i < requiredFields.length; i++) {
-        const field = requiredFields[i];
-        if (!(field in req.body)) {
-          return res.status(400).json({
-            message: constants.MISSING_FIELD(field),
+  const requiredFields = Appointment.getRequiredForCreate();
+  for (let i = 0; i < requiredFields.length; i++) {
+    const field = requiredFields[i];
+    if (!(field in req.body)) {
+      return res.status(400).json({
+        message: constants.MISSING_FIELD(field),
+      });
+    }
+  }
+  return HumanValidation.findById(req.body.authorization)
+    .then(validation => {
+      if (validation) {
+        if (!(validation.mobilePhone === req.body.mobilePhone)) {
+          return res.status(409).json({
+            message: constants.MOBILE_AUTH_MISMATCH,
           });
         }
-      }
-      return HumanValidation.findById(req.body.authorization)
-        .then(validation => {
-          if (validation) {
-            if (!(validation.mobilePhone === req.body.mobilePhone)) {
-              return res.status(409).json({
-                message: constants.MOBILE_AUTH_MISMATCH,
-              });
-            }
-            return User.findById(req.body.provider)
-              .then(user => {
-                if (user) {
-                  return Appointment.findOne({
-                    user_id: req.body.provider,
-                    date: startOfDay(req.body.date),
-                    time: req.body.time,
-                  })
-                    .then(existing => {
-                      if (!existing) {
-                        const data = {
-                          user_id: req.body.provider,
-                          firstName: req.body.firstName,
-                          lastName: req.body.lastName,
-                          mobilePhone: req.body.mobilePhone,
-                          date: startOfDay(req.body.date),
-                          time: req.body.time,
-                          authorization: req.body.authorization,
-                          confirm: true,
-                        };
-                        return Appointment.create(data)
-                          .then(appt =>
-                            res.status(202).json({
-                              message: constants.APPOINTMENT_CREATED,
-                              ...appt.apiGet(),
-                            }),
-                          )
-                          .catch(error =>
-                            res.status(409).json({
-                              message: error.message,
-                            }),
-                          );
-                      }
-                      return res.status(409).json({
-                        message: constants.APPOINTMENT_DATETIME_UNAVAIL,
-                      });
-                    })
-                    .catch(error =>
-                      res.status(400).json({
-                        message: error.message,
-                      }),
-                    );
-                }
+        return User.findById(req.body.providerId)
+          .then(user => {
+            const appTime = parse(`${req.body.date}, ${req.body.time}`);
+            if (user) {
+              return Appointment.findOne({
+                user_id: req.body.providerId,
+                date: startOfDay(req.body.date),
+                time: appTime,
               })
-              .catch(() => {
-                res.status(409).json({
-                  message: constants.PROVIDER_NOT_FOUND,
-                });
-              });
-          }
-          return res.status(409).json({
-            message: constants.VALIDATION_INVALID,
+                .then(existing => {
+                  if (!existing) {
+                    const data = {
+                      user_id: req.body.providerId,
+                      firstName: req.body.firstName,
+                      lastName: req.body.lastName,
+                      mobilePhone: req.body.mobilePhone,
+                      date: startOfDay(req.body.date),
+                      time: appTime,
+                      authorization: req.body.authorization,
+                      confirm: true,
+                    };
+                    return Appointment.create(data)
+                      .then(appt =>
+                        res.status(202).json({
+                          message: constants.APPOINTMENT_CREATED,
+                          ...appt.apiGet(),
+                        }),
+                      )
+                      .catch(error =>
+                        res.status(409).json({
+                          message: error.message,
+                        }),
+                      );
+                  }
+                  return res.status(409).json({
+                    message: constants.APPOINTMENT_DATETIME_UNAVAIL,
+                  });
+                })
+                .catch(error =>
+                  res.status(400).json({
+                    message: error.message,
+                  }),
+                );
+            }
+          })
+          .catch(() => {
+            res.status(409).json({
+              message: constants.PROVIDER_NOT_FOUND,
+            });
           });
-        })
-        .catch(() =>
-          res.status(500).json({
-            message: constants.INTERNAL_SERVER_ERROR,
-          }),
-        );
-    }
-    return res.staus(400).json({
-      message: constants.RECAPTCHA_FAILED,
-    });
-  })
-  .catch( () => res.status(400).json({
-      message: constants.RECAPTCHA_FAILED
+      }
+      return res.status(409).json({
+        message: constants.VALIDATION_INVALID,
+      });
     })
-  );
+    .catch(() =>
+      res.status(500).json({
+        message: constants.INTERNAL_SERVER_ERROR,
+      }),
+    );
 };
 
 const getAppointments = (req, res) => {

@@ -87,7 +87,7 @@ AppointmentSchema.methods.apiGet = function() {
 AppointmentSchema.statics = {
   getRequiredForCreate() {
     return [
-      'provider',
+      'providerId',
       'firstName',
       'lastName',
       'mobilePhone',

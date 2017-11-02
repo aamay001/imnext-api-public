@@ -21,57 +21,59 @@ const create = (req, res) => {
   (config.PRODUCTION
     ? recaptcha.validateRequest(req)
     : new Promise(resolve => resolve(true))
-  ).then(captchaOk => {
-    if (captchaOk) {
-      const requiredFields = User.getRequiredForCreate();
-      for (let i = 0; i < requiredFields.length; i++) {
-        const field = requiredFields[i];
-        if (!(field in req.body)) {
-          return res.status(400).json({
-            message: constants.MISSING_FIELD(field),
-          });
+  )
+    .then(captchaOk => {
+      if (captchaOk) {
+        const requiredFields = User.getRequiredForCreate();
+        for (let i = 0; i < requiredFields.length; i++) {
+          const field = requiredFields[i];
+          if (!(field in req.body)) {
+            return res.status(400).json({
+              message: constants.MISSING_FIELD(field),
+            });
+          }
         }
-      }
-      const body = req.body;
-      body.email = req.body.email.toLowerCase();
-      User.create(body)
-        .then(newUser => {
-          console.info(`User account created: ${req.body.email}`.cyan);
-          const humanValidation = {
-            firstName: body.firstName,
-            lastName: body.lastName,
-            mobilePhone: body.mobilePhone,
-            type: 'ACTIVATION',
-            activationId: newUser._id.toString(),
-          };
-          return HumanValidation.create(humanValidation).then(hV =>
-            twilio
-              .sendSMS(
-                constants.ACCOUNT_ACTIVATION_SMS(hV.validationCode),
-                humanValidation.mobilePhone,
-              )
-              .then(() =>
-                res.status(201).json({
-                  message: constants.USER_CREATE_SUCCESS,
-                }),
-              ),
+        const body = req.body;
+        body.email = req.body.email.toLowerCase();
+        User.create(body)
+          .then(newUser => {
+            console.info(`User account created: ${req.body.email}`.cyan);
+            const humanValidation = {
+              firstName: body.firstName,
+              lastName: body.lastName,
+              mobilePhone: body.mobilePhone,
+              type: 'ACTIVATION',
+              activationId: newUser._id.toString(),
+            };
+            return HumanValidation.create(humanValidation).then(hV =>
+              twilio
+                .sendSMS(
+                  constants.ACCOUNT_ACTIVATION_SMS(hV.validationCode),
+                  humanValidation.mobilePhone,
+                )
+                .then(() =>
+                  res.status(201).json({
+                    message: constants.USER_CREATE_SUCCESS,
+                  }),
+                ),
+            );
+          })
+          .catch(error =>
+            res.status(400).json({
+              message: error.message,
+            }),
           );
-        })
-        .catch(error =>
-          res.status(400).json({
-            message: error.message,
-          }),
-        );
-    } else {
-      return res.status(400).json({
-        message: constants.RECAPTCHA_FAILED,
-      });
-    }
-  })
-  .catch( () => res.status(400).json({
-      message: constants.RECAPTCHA_FAILED
+      } else {
+        return res.status(400).json({
+          message: constants.RECAPTCHA_FAILED,
+        });
+      }
     })
-  );
+    .catch(() =>
+      res.status(400).json({
+        message: constants.RECAPTCHA_FAILED,
+      }),
+    );
 };
 
 const get = (req, res) => {

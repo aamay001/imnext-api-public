@@ -128,8 +128,8 @@ UserSchema.methods = {
 
   apiGetJwtPayload() {
     return {
-      email: this.email
-    }
+      email: this.email,
+    };
   },
 
   apiGetProvider() {
