@@ -43,6 +43,7 @@ const create = (req, res) => {
               lastName: body.lastName,
               mobilePhone: body.mobilePhone,
               type: 'ACTIVATION',
+              validationCode: Math.floor(Math.random() * (99999999 - 10000000 + 1) + 10000000),
               activationId: newUser._id.toString(),
             };
             return HumanValidation.create(humanValidation).then(hV =>
