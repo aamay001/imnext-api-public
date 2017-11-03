@@ -7,7 +7,6 @@ import parse from 'date-fns/parse';
 import isWithinRange from 'date-fns/is_within_range';
 import startOfDay from 'date-fns/start_of_day';
 import endOfDay from 'date-fns/end_of_day';
-import isAfter from 'date-fns/is_after';
 import isEqual from 'date-fns/is_equal';
 import settings from '../config';
 import models from '../models/';
@@ -53,6 +52,7 @@ const create = (req, res) => {
                       time: appTime,
                       authorization: req.body.authorization,
                       confirm: true,
+                      created: new Date(),
                     };
                     return Appointment.create(data)
                       .then(appt =>

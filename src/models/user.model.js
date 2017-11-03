@@ -74,7 +74,7 @@ const UserSchema = new Schema({
   },
   appointmentTime: {
     type: Number,
-    default: 30,
+    default: 45,
   },
   workBreakLengthMinutes: {
     type: Number,
@@ -94,7 +94,7 @@ const UserSchema = new Schema({
   },
   created: {
     type: Date,
-    default: new Date(),
+    required: true,
   },
 });
 
@@ -123,6 +123,7 @@ UserSchema.methods = {
       workBreakLengthMinutes: this.workBreakLengthMinutes,
       appointmentTime: this.appointmentTime,
       providerName: this.providerName,
+      activated: this.activated,
     };
   },
 

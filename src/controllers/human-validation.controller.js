@@ -2,6 +2,7 @@
 'use strict';
 
 import reCAPTCHA from 'recaptcha2';
+import addMinutes from 'date-fns/add_minutes';
 import settings from '../config';
 import models from '../models/';
 import twilio from '../service/twilio';
@@ -31,6 +32,7 @@ const create = (req, res) => {
             });
           }
         }
+        const now = new Date();
         const data = {
           firstName: req.body.firstName,
           lastName: req.body.lastName,
@@ -38,8 +40,9 @@ const create = (req, res) => {
           validationCode: Math.floor(
             Math.random() * (99999999 - 10000000 + 1) + 10000000,
           ),
+          created: now,
+          expiration: addMinutes(now, 30),
         };
-        const now = new Date();
         return HumanValidation.findOne({
           mobilePhone: data.mobilePhone,
           complete: false,
@@ -132,7 +135,7 @@ const activate = (req, res) => {
           });
         });
       }
-      return res.status(200).json({
+      return res.status(400).json({
         message: constants.ACCOUNT_ACTIVATION_FAILED,
       });
     })

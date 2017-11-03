@@ -1,7 +1,6 @@
 'use strict';
 
 import mongoose, { Schema } from 'mongoose';
-import addMinutes from 'date-fns/add_minutes';
 import constants from '../config/constants';
 
 const { REGEX } = constants;
@@ -38,7 +37,7 @@ const HumanValidationSchema = new Schema({
   },
   expiration: {
     type: Date,
-    default: addMinutes(new Date(), 30),
+    required: true,
   },
   complete: {
     type: Boolean,
@@ -52,7 +51,7 @@ const HumanValidationSchema = new Schema({
   },
   created: {
     type: Date,
-    default: new Date(),
+    required: true,
   },
   completedOn: {
     type: Date,

@@ -29,7 +29,7 @@ export default {
   SERVER_DB_CONNECT_ERROR: err => `Database connect error. Error: ${err}`.red,
   SERVER_DB_CONNECT_SUCCESS: db =>
     `Database connect success. Connected to ${db}.`.green,
-  USER_CREATE_SUCCESS: 'User account created',
+  USER_CREATE_SUCCESS: 'User account created!',
   MISSING_FIELD: field => `Missing ${field} in request.`,
   APPOINTMENT_VALIDATION_SMS: code =>
     `imNext Appointment Validation Code: ${code}\nExpires in 30 minutes`,

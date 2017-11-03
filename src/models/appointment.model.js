@@ -68,6 +68,10 @@ const AppointmentSchema = new Schema({
     trim: true,
     unique: true,
   },
+  created: {
+    type: Date,
+    required: true,
+  },
 });
 
 AppointmentSchema.plugin(uniqueValidator, {

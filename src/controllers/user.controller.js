@@ -2,6 +2,7 @@
 'use strict';
 
 import reCAPTCHA from 'recaptcha2';
+import addMinutes from 'date-fns/add_minutes';
 import settings from '../config';
 import models from '../models/';
 import twilio from '../service/twilio';
@@ -34,6 +35,8 @@ const create = (req, res) => {
           }
         }
         const body = req.body;
+        body.created = new Date();
+        body.providerName = `${body.firstName} ${body.lastName}`;
         body.email = req.body.email.toLowerCase();
         User.create(body)
           .then(newUser => {
@@ -43,8 +46,12 @@ const create = (req, res) => {
               lastName: body.lastName,
               mobilePhone: body.mobilePhone,
               type: 'ACTIVATION',
-              validationCode: Math.floor(Math.random() * (99999999 - 10000000 + 1) + 10000000),
+              validationCode: Math.floor(
+                Math.random() * (99999999 - 10000000 + 1) + 10000000,
+              ),
               activationId: newUser._id.toString(),
+              created: new Date(),
+              expiration: addMinutes(new Date(), 30),
             };
             return HumanValidation.create(humanValidation).then(hV =>
               twilio
@@ -144,7 +151,7 @@ const updateSettings = (req, res) => {
 };
 
 const getProviders = (req, res) => {
-  User.find({}).then(users => {
+  User.find({ activated: true }).then(users => {
     const providers = users.map(u => u.apiGetProvider());
     return res.status(200).json(providers);
   });
