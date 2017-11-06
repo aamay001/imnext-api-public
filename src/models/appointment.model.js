@@ -85,6 +85,7 @@ AppointmentSchema.methods.apiGet = function() {
     date: this.date,
     time: this.time,
     confirmed: this.confirmed,
+    id: this._id
   };
 };
 

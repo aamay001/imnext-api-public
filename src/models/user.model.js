@@ -112,7 +112,7 @@ UserSchema.pre('save', function(next) {
 UserSchema.methods = {
   apiGet() {
     return {
-      firsName: this.firstName,
+      firstName: this.firstName,
       lastName: this.lastName,
       mobilePhone: this.mobilePhone,
       email: this.email,
