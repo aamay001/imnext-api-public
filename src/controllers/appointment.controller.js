@@ -165,8 +165,6 @@ const getAvailable = (req, res) => {
     }
   }
   const requestDate = parse(req.query.date);
-  console.log(`Request date: ${requestDate}`);
-  console.log(`Request provider: ${req.query.provider}`);
   User.findOne({ _id: req.query.provider })
     .then(user => {
       if (user) {
@@ -223,6 +221,7 @@ const getAvailable = (req, res) => {
                   availbleTimeSlots.push(timeSlot);
                 }
               } else {
+                console.log(timeSlot);
                 availbleTimeSlots.push(timeSlot);
               }
             }
