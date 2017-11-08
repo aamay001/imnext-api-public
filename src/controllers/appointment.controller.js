@@ -182,18 +182,18 @@ const getAvailable = (req, res) => {
           },
         }).then(existingAppointments => {
           const availbleTimeSlots = [];
-          const startTime = parse(
+          const startTime = parse(parse(
             `${req.query.date} ${format(
               user.workDayStartTime,
               constants.DISPLAY_TIME_FORMAT,
             )}`,
-          );
-          const endTime = parse(
+          ).toUTCString());
+          const endTime = parse(parse(
             `${req.query.date} ${format(
               user.workDayEndTime,
               constants.DISPLAY_TIME_FORMAT,
             )}`,
-          );
+          ).toUTCString());
           const breakStartTime = parse(
             `${req.query.date} ${format(
               user.workBreakStartTime,
