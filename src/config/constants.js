@@ -1,4 +1,5 @@
 'use strict';
+import format from 'date-fns/format';
 import config from './config';
 import colors from 'colors';
 
@@ -15,6 +16,7 @@ const REGEX = {
 };
 
 const DATE_FORMAT = 'YYYY-MM-DD';
+const DISPLAY_DATE_FORMAT = 'dddd, MMMM DD';
 const DISPLAY_TIME_FORMAT = 'h:mm A';
 
 export default {
@@ -53,4 +55,5 @@ export default {
   APPOINTMENT_DATETIME_UNAVAIL:
     'The appointment date and time is no longer available.',
   APPOINTMENT_CREATED: 'Appointment scheduled!',
+  APPOINTMENT_SCHEDULED_SMS: (appt, provider) => `Appointment Scheduled: ${format(appt.date, DISPLAY_DATE_FORMAT)} at ${format(appt.time, DISPLAY_TIME_FORMAT)} with ${provider}. Thanks for using imNext!`
 };

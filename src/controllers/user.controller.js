@@ -126,7 +126,7 @@ const updateSettings = (req, res) => {
           });
         }
         const updateData = {
-          workHoursPerDay: req.body.workHoursPerDay,
+          appointmentTime: req.body.appointmentTime,
           workDays: req.body.workDays,
           workDayStartTime: req.body.workDayStartTime,
           workDayEndTime: req.body.workDayEndTime,

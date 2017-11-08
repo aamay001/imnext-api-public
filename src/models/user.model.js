@@ -86,7 +86,7 @@ const UserSchema = new Schema({
     type: String,
     trim: true,
     minlength: 8,
-    maxlength: 64,
+    maxlength: 48,
   },
   activated: {
     type: Boolean,

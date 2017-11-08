@@ -10,6 +10,9 @@ import endOfDay from 'date-fns/end_of_day';
 import isEqual from 'date-fns/is_equal';
 import settings from '../config';
 import models from '../models/';
+import twilio from '../service/twilio';
+
+twilio.init();
 
 const { Appointment, HumanValidation, User } = models;
 const { constants } = settings;
@@ -56,10 +59,16 @@ const create = (req, res) => {
                     };
                     return Appointment.create(data)
                       .then(appt =>
-                        res.status(202).json({
-                          message: constants.APPOINTMENT_CREATED,
-                          ...appt.apiGet(),
-                        }),
+                        twilio.sendSMS(
+                          constants.APPOINTMENT_SCHEDULED_SMS(appt, user.providerName),
+                          req.body.mobilePhone
+                        )
+                        .then(() =>
+                          res.status(202).json({
+                            message: constants.APPOINTMENT_CREATED,
+                            ...appt.apiGet(),
+                          })
+                        )
                       )
                       .catch(error =>
                         res.status(409).json({
