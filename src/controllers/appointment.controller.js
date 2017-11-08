@@ -200,19 +200,20 @@ const getAvailable = (req, res) => {
               constants.DISPLAY_TIME_FORMAT,
             )}`,
           );
+          console.log(startTime);
+          console.log(endTime);
+          console.lgo(breakStartTime);
           for (
             let timeSlot = startTime;
             isBefore(timeSlot, endTime);
             timeSlot = addMinutes(timeSlot, user.appointmentTime)
           ) {
-            if (
-              !isWithinRange(
-                timeSlot,
-                breakStartTime,
-                addMinutes(breakStartTime, user.workBreakLengthMinutes - 1),
-              )
-            ) {
-
+            console.log(timeSlot);
+            const overlapsWithBreak = isWithinRange(
+              timeSlot,
+              breakStartTime,
+              addMinutes(breakStartTime, user.workBreakLengthMinutes - 1))
+            if (!overlapsWithBreak) {
               if ( existingAppointments.length > 0 ) {
                 const alreadyTaken = existingAppointments.find(app =>
                   isEqual(app.time, timeSlot),
