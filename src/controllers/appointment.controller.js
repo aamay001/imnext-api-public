@@ -171,7 +171,6 @@ const getAvailable = (req, res) => {
     .then(user => {
       if (user) {
         const day = requestDate.getDay();
-        console.log(`day:  ${day}` );
         if (!user.workDays[day]) {
           return res.status(200).json({
             message: 'No time slots available.',
@@ -184,8 +183,6 @@ const getAvailable = (req, res) => {
             $lte: endOfDay(requestDate),
           },
         }).then(existingAppointments => {
-          console.log('Existing Appointments');
-          console.log(existingAppointments);
           const availbleTimeSlots = [];
           const startTime = parse(
             `${req.query.date} ${format(
@@ -205,9 +202,6 @@ const getAvailable = (req, res) => {
               constants.DISPLAY_TIME_FORMAT,
             )}`,
           );
-          console.log(startTime);
-          console.log(endTime);
-          console.log(breakStartTime);
           for (
             let timeSlot = startTime;
             isBefore(timeSlot, endTime);
