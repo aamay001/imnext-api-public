@@ -17,7 +17,7 @@ const REGEX = {
 
 const DATE_FORMAT = 'YYYY-MM-DD';
 const DISPLAY_DATE_FORMAT = 'dddd, MMMM DD';
-const DISPLAY_TIME_FORMAT = 'H:mm';
+const DISPLAY_TIME_FORMAT = 'H:mm A';
 
 export default {
   REGEX,

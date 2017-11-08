@@ -192,11 +192,7 @@ const getAvailable = (req, res) => {
           let breakStartTime = startOfDay(requestDate);
           breakStartTime = addHours(breakStartTime, parse(user.workBreakStartTime).getHours());
           breakStartTime = addMinutes(breakStartTime, parse(user.workBreakStartTime).getMinutes());
-          console.log(startTime);
-          console.log(endTime);
-          console.log(breakStartTime);
           for ( let timeSlot = startTime; isBefore(timeSlot, endTime); timeSlot = addMinutes(timeSlot, user.appointmentTime) ) {
-            console.log(timeSlot);
             const overlapsWithBreak = isWithinRange(
               timeSlot,
               breakStartTime,
@@ -210,7 +206,6 @@ const getAvailable = (req, res) => {
                   availbleTimeSlots.push(timeSlot);
                 }
               } else {
-                console.log(timeSlot);
                 availbleTimeSlots.push(timeSlot);
               }
             }
