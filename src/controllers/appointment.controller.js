@@ -3,6 +3,7 @@
 import format from 'date-fns/format';
 import isBefore from 'date-fns/is_before';
 import addMinutes from 'date-fns/add_minutes';
+import addHours from 'date-fns/add_hours';
 import parse from 'date-fns/parse';
 import isWithinRange from 'date-fns/is_within_range';
 import startOfDay from 'date-fns/start_of_day';
@@ -182,11 +183,14 @@ const getAvailable = (req, res) => {
           },
         }).then(existingAppointments => {
           const availbleTimeSlots = [];
-          let startTime = new Date(req.query.date).setHours(parse(user.workDayStartTime).getHours());
+          let startTime = startOfDay(requestDate);
+          startTime = addHours(startTime, parse(user.workDayStartTime).getHours())
           startTime = addMinutes(startTime, parse(user.workDayStartTime).getMinutes());
-          let endTime = new Date(req.query.date).setHours(parse(user.workDayEndTime).getHours());
+          let endTime = startOfDay(requestDate);
+          endTime = addHours(endTime, parse(user.workDayEndTime).getHours());
           endTime = addMinutes(endTime, parse(user.workDayEndTime).getMinutes());
-          let breakStartTime = new Date(req.query.date).setHours(parse(user.workBreakStartTime).getHours())
+          let breakStartTime = startOfDay(requestDate);
+          breakStartTime = addHours(breakStartTime, parse(user.workBreakStartTime).getHours());
           breakStartTime = addMinutes(breakStartTime, parse(user.workBreakStartTime).getMinutes());
           console.log(startTime);
           console.log(endTime);
