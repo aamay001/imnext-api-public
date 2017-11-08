@@ -205,6 +205,9 @@ const getAvailable = (req, res) => {
               constants.DISPLAY_TIME_FORMAT,
             )}`,
           );
+          console.log(startTime);
+          console.log(endTime);
+          console.log(breakStartTime);
           for (
             let timeSlot = startTime;
             isBefore(timeSlot, endTime);
