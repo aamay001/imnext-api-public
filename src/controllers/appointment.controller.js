@@ -203,11 +203,7 @@ const getAvailable = (req, res) => {
           console.log(startTime);
           console.log(endTime);
           console.log(breakStartTime);
-          for (
-            let timeSlot = startTime;
-            isBefore(timeSlot, endTime);
-            timeSlot = addMinutes(timeSlot, user.appointmentTime)
-          ) {
+          for ( let timeSlot = startTime; isBefore(timeSlot, endTime); timeSlot = addMinutes(timeSlot, user.appointmentTime) ) {
             console.log(timeSlot);
             const overlapsWithBreak = isWithinRange(
               timeSlot,
