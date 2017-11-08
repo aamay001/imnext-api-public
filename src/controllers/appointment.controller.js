@@ -202,7 +202,7 @@ const getAvailable = (req, res) => {
           );
           console.log(startTime);
           console.log(endTime);
-          console.lgo(breakStartTime);
+          console.log(breakStartTime);
           for (
             let timeSlot = startTime;
             isBefore(timeSlot, endTime);
