@@ -212,12 +212,18 @@ const getAvailable = (req, res) => {
                 addMinutes(breakStartTime, user.workBreakLengthMinutes - 1),
               )
             ) {
-              const alreadyTaken = existingAppointments.find(app =>
-                isEqual(app.time, timeSlot),
-              );
-              if (!alreadyTaken) {
+
+              if ( existingAppointments.length > 0 ) {
+                const alreadyTaken = existingAppointments.find(app =>
+                  isEqual(app.time, timeSlot),
+                );
+                if (!alreadyTaken) {
+                  availbleTimeSlots.push(timeSlot);
+                }
+              } else {
                 availbleTimeSlots.push(timeSlot);
               }
+
             }
           }
           if (availbleTimeSlots.length === 0) {
