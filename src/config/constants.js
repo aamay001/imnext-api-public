@@ -55,5 +55,12 @@ export default {
   APPOINTMENT_DATETIME_UNAVAIL:
     'The appointment date and time is no longer available.',
   APPOINTMENT_CREATED: 'Appointment scheduled!',
-  APPOINTMENT_SCHEDULED_SMS: (appt, provider) => `Appointment Scheduled: ${format(appt.date, DISPLAY_DATE_FORMAT)} at ${format(appt.time, 'h:mm A')} with ${provider}. Thanks for using imNext!`
+  APPOINTMENT_SCHEDULED_SMS: (appt, provider) =>
+    `Appointment Scheduled: ${format(
+      appt.date,
+      DISPLAY_DATE_FORMAT,
+    )} at ${format(
+      appt.time,
+      'h:mm A',
+    )} with ${provider}. Thanks for using imNext!`,
 };

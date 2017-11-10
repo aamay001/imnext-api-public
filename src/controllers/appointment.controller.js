@@ -60,16 +60,20 @@ const create = (req, res) => {
                     };
                     return Appointment.create(data)
                       .then(appt =>
-                        twilio.sendSMS(
-                          constants.APPOINTMENT_SCHEDULED_SMS(appt, user.providerName),
-                          req.body.mobilePhone
-                        )
-                        .then(() =>
-                          res.status(202).json({
-                            message: constants.APPOINTMENT_CREATED,
-                            ...appt.apiGet(),
-                          })
-                        )
+                        twilio
+                          .sendSMS(
+                            constants.APPOINTMENT_SCHEDULED_SMS(
+                              appt,
+                              user.providerName,
+                            ),
+                            req.body.mobilePhone,
+                          )
+                          .then(() =>
+                            res.status(202).json({
+                              message: constants.APPOINTMENT_CREATED,
+                              ...appt.apiGet(),
+                            }),
+                          ),
                       )
                       .catch(error =>
                         res.status(409).json({
@@ -184,21 +188,41 @@ const getAvailable = (req, res) => {
         }).then(existingAppointments => {
           const availbleTimeSlots = [];
           let startTime = startOfDay(requestDate);
-          startTime = addHours(startTime, parse(user.workDayStartTime).getHours())
-          startTime = addMinutes(startTime, parse(user.workDayStartTime).getMinutes());
+          startTime = addHours(
+            startTime,
+            parse(user.workDayStartTime).getHours(),
+          );
+          startTime = addMinutes(
+            startTime,
+            parse(user.workDayStartTime).getMinutes(),
+          );
           let endTime = startOfDay(requestDate);
           endTime = addHours(endTime, parse(user.workDayEndTime).getHours());
-          endTime = addMinutes(endTime, parse(user.workDayEndTime).getMinutes());
+          endTime = addMinutes(
+            endTime,
+            parse(user.workDayEndTime).getMinutes(),
+          );
           let breakStartTime = startOfDay(requestDate);
-          breakStartTime = addHours(breakStartTime, parse(user.workBreakStartTime).getHours());
-          breakStartTime = addMinutes(breakStartTime, parse(user.workBreakStartTime).getMinutes());
-          for ( let timeSlot = startTime; isBefore(timeSlot, endTime); timeSlot = addMinutes(timeSlot, user.appointmentTime) ) {
+          breakStartTime = addHours(
+            breakStartTime,
+            parse(user.workBreakStartTime).getHours(),
+          );
+          breakStartTime = addMinutes(
+            breakStartTime,
+            parse(user.workBreakStartTime).getMinutes(),
+          );
+          for (
+            let timeSlot = startTime;
+            isBefore(timeSlot, endTime);
+            timeSlot = addMinutes(timeSlot, user.appointmentTime)
+          ) {
             const overlapsWithBreak = isWithinRange(
               timeSlot,
               breakStartTime,
-              addMinutes(breakStartTime, user.workBreakLengthMinutes - 1))
+              addMinutes(breakStartTime, user.workBreakLengthMinutes - 1),
+            );
             if (!overlapsWithBreak) {
-              if ( existingAppointments.length > 0 ) {
+              if (existingAppointments.length > 0) {
                 const alreadyTaken = existingAppointments.find(app =>
                   isEqual(app.time, timeSlot),
                 );
