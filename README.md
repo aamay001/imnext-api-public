@@ -54,6 +54,8 @@ With answers to the questions above, the algorithm generate availability. Additi
 + chai-http
 + chai-datetime
 + mocha
++ travisci
++ heroku
 
 # Clone & Run
 
