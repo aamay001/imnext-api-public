@@ -2,6 +2,8 @@
 
 This repository contains the serverside code for the imNext.online project. The imNext.online project is a self-service appointment scheduling sytsem that enables users to schedule appointments directly with their service providers. The api is written in JavaScript with **Node.js** and **MongoDB** as the database; **Mongoose** is used as the ODM.
 
+The client for this project can be found here: [imNext.online Client Repository](https://github.com/aamay001/imnext-client)
+
 # Key Features
 
 ## Human Validation System
