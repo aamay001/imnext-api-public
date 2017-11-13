@@ -77,7 +77,7 @@ CAPTCHA_SITE_KEY=
 // WHATEVER YOU WANT FOR DEV / SOMETHING SECRET FOR PROD
 TOKEN_SECRET=
 
-// SIGN UP FOR TWILIO ACCOUNT
+// SIGN UP FOR TWILIO ACCOUNT (When in development, messages will appear in Terminal; actual sms are only sent out in Prod)
 TWILIO_ACCOUNT=
 TWILIO_NUMBER=
 TWILIO_TOKEN=
