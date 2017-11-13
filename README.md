@@ -1,6 +1,6 @@
 # imNext.online API 
 
-This repository contains the serverside code for the imNext.online project. The imNext.online project is a self-service appointment scheduling system that enables users to schedule appointments directly with their service providers. The api is written in JavaScript with **Node.js** and **MongoDB** as the database; **Mongoose** is used as the ODM.
+This repository contains the server side code for the imNext.online project. The imNext.online project is a self-service appointment scheduling system that enables users to schedule appointments directly with their service providers. The api is written in JavaScript with **Node.js** and **MongoDB** as the database; **Mongoose** is used as the ODM.
 
 The client for this project can be found here: [imNext.online Client Repository](https://github.com/aamay001/imnext-client)
 
@@ -10,7 +10,7 @@ The client for this project can be found here: [imNext.online Client Repository]
 
 [src\controllers\human-validation.controller.js](https://github.com/aamay001/imnext-api/blob/master/src/controllers/human-validation.controller.js)
 
-With the use of the **Twilio API** and **Google's reCAPTCHA2**, humans are validated with a two step verfication process. The first step towards human validation is to provide a legitimate mobile phone number and pass the reCAPTCHA test. After submitting a valid mobile phone number, the user will receive a randomized 8 digit validation code that expires in 30 minutes. Once a validation code has been issued, a second validation code is not issued until the first one expires or is used. Validations are required for appointment scheduling and account activation.
+With the use of the **Twilio API** and **Google's reCAPTCHA2**, humans are validated with a two step verification process. The first step towards human validation is to provide a legitimate mobile phone number and pass the reCAPTCHA test. After submitting a valid mobile phone number, the user will receive a randomized 8-digit validation code that expires in 30 minutes. Once a validation code has been issued, a second validation code is not issued until the first one expires or is used. Validations are required for appointment scheduling and account activation.
 
 ## Authentication Service
 
