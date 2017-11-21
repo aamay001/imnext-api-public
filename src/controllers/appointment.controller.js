@@ -143,8 +143,7 @@ const getAppointments = (req, res) => {
             if (mapItem) {
               mapItem.push(_app.apiGet());
             } else {
-              appointmentsMap.set(date, []);
-              appointmentsMap.get(date).push(_app.apiGet());
+              appointmentsMap.set(date, [_app.apiGet()]);
             }
           });
           return res.status(200).json(appointmentsMap);
