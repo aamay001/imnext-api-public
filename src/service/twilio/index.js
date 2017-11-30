@@ -22,7 +22,11 @@ function sendSMS(body, to) {
       from: TWILIO_NUMBER, // From a valid Twilio number
     });
   }
-  console.info(`Twilio :\nTo: ${to}\nMessage: ${body}`.yellow);
+  if(config.DEVELOPMENT) {
+    console.info(`Twilio :\nTo: ${to}\nMessage: ${body}`.yellow);
+  } else if (config.TEST) {
+    console.info('Twilio message send simulated.'.cyan);
+  }
   return Promise.resolve({
     sid: 'testok',
   });

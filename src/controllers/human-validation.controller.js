@@ -57,13 +57,22 @@ const create = (req, res) => {
                     constants.APPOINTMENT_VALIDATION_SMS(hV.validationCode),
                     hV.mobilePhone,
                   )
-                  .then(() =>
-                    res.status(201).json({
+                  .then(() => {
+                    if(config.TEST || config.DEVELOPMENT) {
+                      console.info('Human Validation created.'.cyan);
+                    }
+                    return res.status(201).json({
                       message: constants.VALIDATION_CREATED,
-                    }),
+                    })
+                  }
                   );
               })
-              .catch(err => res.status(500).json(err));
+              .catch(err => {
+                if (config.DEVELOPMENT || config.TEST) {
+                  console.error(err);
+                }
+                res.status(500).json(err)
+              });
           }
           return res.status(429).json({
             message: constants.VALIDATION_EXISTS,
@@ -176,6 +185,9 @@ const validate = (req, res) => {
   )
     .then(validation => {
       if (validation) {
+        if(config.TEST || config.DEVELOPMENT) {
+          console.info('Validation code validated.'.green);
+        }
         return res.status(202).json({
           message: constants.VALIDATION_SUCCESS,
           authorization: validation._id,

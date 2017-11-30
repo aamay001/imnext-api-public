@@ -11,6 +11,7 @@ const TOKEN_SECRET = process.env.TOKEN_SECRET;
 const TOKEN_EXP = process.env.TOKEN_EXP || '7d';
 const DEVELOPMENT = process.env.NODE_ENV === 'dev';
 const PRODUCTION = process.env.NODE_ENV === 'prod';
+const TEST = process.env.NODE_ENV === 'test';
 const TWILIO_ACCOUNT = process.env.TWILIO_ACCOUNT;
 const TWILIO_TOKEN = process.env.TWILIO_TOKEN;
 const TWILIO_NUMBER = process.env.TWILIO_NUMBER;
@@ -43,4 +44,5 @@ module.exports = {
   CAPTCHA_SITE_KEY,
   MONGOOSE_DB,
   CLIENT_ORIGIN,
+  TEST
 };

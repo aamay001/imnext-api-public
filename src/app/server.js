@@ -14,8 +14,10 @@ const use = app => {
   _app = app;
 };
 
-const start = (database = config.DATABASE_URL) =>
-  new Promise((resolve, reject) => {
+const DB = config.TEST ? config.TEST_DATABASE_URL : config.DATABASE_URL;
+
+const start = (database = DB) =>
+  new Promise((resolve, reject) =>
     mongoose.connect(database, { useMongoClient: true }, err => {
       if (err) {
         console.error(constants.SERVER_DB_CONNECT_ERROR(err));
@@ -36,24 +38,22 @@ const start = (database = config.DATABASE_URL) =>
           mongoose.disconnect();
           return reject(error);
         });
-    });
-  });
+    }));
 
 const stop = () =>
-  mongoose.disconnect().then(
-    () =>
-      new Promise((resolve, reject) => {
-        console.log(constants.SERVER_STOPPING);
-        _server.close(err => {
-          if (err) {
-            console.log(constants.SERVER_STOP_ERROR(err));
-            return reject(err);
-          }
-          console.log('Server stopped.');
-          return resolve();
-        });
-      }),
-  );
+  mongoose.disconnect().then(() =>
+    new Promise((resolve, reject) => {
+      console.log(constants.SERVER_STOPPING);
+      _server.close(err => {
+        if (err) {
+          console.error(constants.SERVER_STOP_ERROR(err));
+          return reject(err);
+        }
+        console.log('Server stopped.');
+        return resolve();
+      });
+    })
+  )
 
 export default {
   start,

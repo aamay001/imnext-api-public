@@ -11,7 +11,7 @@ const expect = chai.expect;
 const { startServer, stopServer } = require('../app');
 const config = require('../config/config');
 
-describe('Server Start and Stop', () => {
+describe('SERVER HANDLE'.bgWhite.black, () => {
   describe('START', () => {
     it('should start the server.', () =>
       expect(startServer(config.TEST_DATABASE_URL)).to.be.fulfilled);

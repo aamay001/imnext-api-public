@@ -10,15 +10,14 @@ const { config } = settings;
 chai.use(chaiHttp);
 const expect = chai.expect;
 
-describe('STATIC, SERVE', () => {
+describe('STATIC, SERVE'.bgWhite.black, () => {
   before(() => startServer(config.TEST_DATABASE_URL));
 
   after(() => stopServer());
 
   describe('index.html', () => {
     it('should serve the static index.html file', () =>
-      chai
-        .request(app)
+      chai.request(app)
         .get('/')
         .then(res => {
           expect(res.status).to.equal(200);
