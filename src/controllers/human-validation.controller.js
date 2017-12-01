@@ -38,7 +38,7 @@ const create = (req, res) => {
           lastName: req.body.lastName,
           mobilePhone: req.body.mobilePhone,
           validationCode: Math.floor(
-            Math.random() * (99999999 - 10000000 + 1) + 10000000,
+            Math.random() * (9999 - 1000 + 1) + 1000,
           ),
           created: now,
           expiration: addMinutes(now, 30),

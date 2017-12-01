@@ -31,8 +31,8 @@ const HumanValidationSchema = new Schema({
   },
   validationCode: {
     type: Number,
-    min: 10000000,
-    max: 99999999,
+    min: 1000,
+    max: 9999,
     required: true,
   },
   expiration: {
