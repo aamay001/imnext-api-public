@@ -47,7 +47,7 @@ const create = (req, res) => {
               mobilePhone: body.mobilePhone,
               type: 'ACTIVATION',
               validationCode: Math.floor(
-                Math.random() * (99999999 - 10000000 + 1) + 10000000,
+                Math.random() * (9999 - 1000 + 1) + 1000,
               ),
               activationId: newUser._id.toString(),
               created: new Date(),
@@ -88,7 +88,10 @@ const get = (req, res) => {
   User.findOne({ email: req.user.email })
     .then(user => {
       if (user) {
-        return res.status(200).json(user.apiGet());
+        return migrate(user)
+        .then(_u => {
+          res.status(200).json(_u.apiGet());
+        });
       }
       return res.status(404).json({
         message: constants.USER_NOT_FOUND,
@@ -96,7 +99,7 @@ const get = (req, res) => {
     })
     .catch(error => {
       console.error(error.red);
-      return res.send(500).json({
+      return res.status(500).json({
         message: constants.INTERNAL_SERVER_ERROR,
       });
     });
@@ -156,6 +159,32 @@ const getProviders = (req, res) => {
     return res.status(200).json(providers);
   });
 };
+
+const migrate = (user) => {
+  if (user.modelVersion <= 0 || !user.modelVersion) {
+    console.log(`User version: ${user.modelVersion}`);
+    console.info(`Migrating user ${user.email} from undefined to verison 1`);
+    const workTimes = [{},{},{},{},{},{},{}].map(obj => ({
+      ...obj,
+      startTime: user.workDayStartTime,
+      endTime: user.workDayEndTime,
+      breakStartTime: user.workBreakStartTime,
+      appointmentTime: user.appointmentTime,
+      breakLength: user.workBreakLengthMinutes
+    }));
+    const migrationData = {
+      ...user.apiGet(),
+      scheduleType: 'FIXED',
+      workTimes,
+      modelVersion: 1
+    };
+    return User.findByIdAndUpdate({ _id: user._id}, migrationData, {
+      upsert: false,
+      new: true,
+    })
+  }
+  return Promise.resolve(user);
+}
 
 export default {
   create,

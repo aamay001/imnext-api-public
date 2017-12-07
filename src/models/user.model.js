@@ -96,6 +96,30 @@ const UserSchema = new Schema({
     type: Date,
     required: true,
   },
+  // VERSION undefind above
+  // VERSION 0 Below
+  scheduleType: {
+    type: String,
+    enum: ['FIXED', 'CUSTOM'],
+    required: true,
+    default: 'FIXED'
+  },
+  workTimes: {
+    type: Array,
+    maxlength: 7,
+    minlength: 7,
+    default: [{
+      startTime: Date,
+      endTime: Date,
+      breakStartTime: Date,
+      appointmentTime: Date,
+      breakLength: Number
+    }]
+  },
+  modelVersion: {
+    type: Number,
+    default: undefined
+  }
 });
 
 UserSchema.plugin(uniqueValidator, {
@@ -124,6 +148,9 @@ UserSchema.methods = {
       appointmentTime: this.appointmentTime,
       providerName: this.providerName,
       activated: this.activated,
+      scheduleType: this.scheduleType,
+      workTimes: this.workTimes,
+      modelVersion: this.modelVersion
     };
   },
 

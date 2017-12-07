@@ -11,7 +11,7 @@ import testUtility from '../utility/testUtil';
 import constants from '../config/constants';
 import authController from '../service/authentication/auth.controller';
 
-const {HumanValidation, User} = models;
+const {HumanValidation} = models;
 
 chai.use(chaiHttp);
 const should = chai.should();
@@ -29,7 +29,8 @@ describe('HUMAN VALIDATION API'.bgWhite.black, () => {
 
   afterEach(() => {
     testUtility.clearCollection('humanvalidations');
-  })
+    testUtility.clearCollection('users');
+  });
 
   describe('/is-human/', () => {
     it('should create a human validation record of type APPOINTMENT', () => {
