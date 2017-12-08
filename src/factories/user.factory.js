@@ -6,7 +6,7 @@ const createOne = () => ({
   firstName: fakes.name.firstName(),
   lastName: fakes.name.lastName(),
   mobilePhone: '323-752-6552',
-  email: fakes.internet.email(),
+  email: fakes.internet.email().toLowerCase(),
   password: '1234Abcd!'
 });
 

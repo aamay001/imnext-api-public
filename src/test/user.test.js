@@ -40,7 +40,7 @@ describe('USER API'.bgWhite.black, () => {
         .send(data)
         .then(res => {
           res.should.contain.status(201);
-          assert(res.body.message, 'User account created!');
+          assert(res.body.message, constants.USER_CREATE_SUCCESS);
         })
         .then(() =>
           User.findOne({mobilePhone: data.mobilePhone})
@@ -55,6 +55,6 @@ describe('USER API'.bgWhite.black, () => {
           assert(isValid, true);
           console.log('User created with matching password.'.green);
         })
-    })
-  })
+    });
+  });
 });

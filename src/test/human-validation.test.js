@@ -11,7 +11,7 @@ import testUtility from '../utility/testUtil';
 import constants from '../config/constants';
 import authController from '../service/authentication/auth.controller';
 
-const {HumanValidation} = models;
+const {HumanValidation, User} = models;
 
 chai.use(chaiHttp);
 const should = chai.should();
@@ -100,4 +100,62 @@ describe('HUMAN VALIDATION API'.bgWhite.black, () => {
         })
     });
   });
+
+  describe('/is-human/activate/', () => {
+    it('should activate a new users account', () => {
+      const data = factory.user.createOne();
+      return chai.request(app)
+        .post('/user')
+        .send(data)
+        .then( res => {
+          res.should.contain.status(201);
+        })
+        .then(() => {
+          HumanValidation.findOne({mobilePhone: data.mobilePhone})
+            .then(validation => {
+              assert(validation.firstName, data.firstName);
+              assert(validation.lastName, data.lastName);
+              data.validationCode = validation.validationCode;
+            })
+        })
+        .then(() => {
+          const token = authController.createToken(data);
+          return chai.request(app)
+            .post('/auth/login')
+            .auth(data.email, data.password)
+            .then(auth => {
+              auth.should.have.status(200);
+              expect(auth.body).to.include.keys(['authToken']);
+              assert(typeof(token),'string');
+              assert(auth.body.user.email, data.email);
+              assert(auth.body.user.mobilePhone, data.mobilePhone);
+              data.authToken = auth.body.authToken;
+            })
+        })
+        .then(() => {
+          const validation = {
+            email: data.email,
+            mobilePhone: data.mobilePhone,
+            validationCode: data.validationCode
+          };
+          return chai.request(app)
+          .put('/is-human/activate')
+          .set('Authorization', `Bearer ${data.authToken}`)
+          .send(validation)
+        })
+        .then(res => {
+          res.should.have.status(202);
+          assert(res.body.message, constants.ACCOUNT_ACTIVATED);
+        })
+        .then(() => User.findOne({email: data.email})
+          .then(user => {
+            assert(user.mobilePhone, data.mobilePhone);
+            assert(user.firstName, data.firstName);
+            assert(user.lastName, data.lastName);
+            assert(user.activated, true);
+          })
+        )
+    });
+  });
+
 });
