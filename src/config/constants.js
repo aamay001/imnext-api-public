@@ -18,11 +18,15 @@ const REGEX = {
 const DATE_FORMAT = 'YYYY-MM-DD';
 const DISPLAY_DATE_FORMAT = 'dddd, MMMM DD';
 const DISPLAY_TIME_FORMAT = 'H:mm A';
+const PIN_LOW = 1000;
+const PIN_HIGH = 9999;
 
 export default {
   REGEX,
   DATE_FORMAT,
   DISPLAY_TIME_FORMAT,
+  PIN_LOW,
+  PIN_HIGH,
   SERVER_START_SUCCESS: `Server start success. Server is listening on port ${config.PORT}.`
     .green,
   SERVER_START_ERROR: err => `Server start error. Error: ${err}`.red,

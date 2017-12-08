@@ -47,7 +47,7 @@ const create = (req, res) => {
               mobilePhone: body.mobilePhone,
               type: 'ACTIVATION',
               validationCode: Math.floor(
-                Math.random() * (9999 - 1000 + 1) + 1000,
+                Math.random() * (constants.PIN_HIGH - constants.PIN_LOW + 1) + constants.PIN_LOW,
               ),
               activationId: newUser._id.toString(),
               created: new Date(),
