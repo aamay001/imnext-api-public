@@ -22,7 +22,9 @@ const CAPTCHA_SECRET = process.env.CAPTCHA_SECRET;
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || 'http://localhost:3000';
 let MONGOOSE_DB;
 
-const CURRENT_ENV = DEVELOPMENT ? 'DEVELOPMENT' : PRODUCTION ? 'PRODUCTION' : 'OTHER';
+const CURRENT_ENV = DEVELOPMENT
+  ? 'DEVELOPMENT'
+  : PRODUCTION ? 'PRODUCTION' : 'OTHER';
 console.log(`NODE ENV: ${CURRENT_ENV}`);
 console.log(`BABEL ENV: ${process.env.BABEL_ENV.toUpperCase()}`);
 
@@ -43,5 +45,5 @@ module.exports = {
   CAPTCHA_SITE_KEY,
   MONGOOSE_DB,
   CLIENT_ORIGIN,
-  TEST
+  TEST,
 };

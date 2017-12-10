@@ -38,7 +38,8 @@ const create = (req, res) => {
           lastName: req.body.lastName,
           mobilePhone: req.body.mobilePhone,
           validationCode: Math.floor(
-            Math.random() * (constants.PIN_HIGH - constants.PIN_LOW + 1) + constants.PIN_LOW,
+            Math.random() * (constants.PIN_HIGH - constants.PIN_LOW + 1) +
+              constants.PIN_LOW,
           ),
           created: now,
           expiration: addMinutes(now, 30),
@@ -58,20 +59,19 @@ const create = (req, res) => {
                     hV.mobilePhone,
                   )
                   .then(() => {
-                    if(config.TEST || config.DEVELOPMENT) {
+                    if (config.TEST || config.DEVELOPMENT) {
                       console.info('Human Validation created.'.cyan);
                     }
                     return res.status(201).json({
                       message: constants.VALIDATION_CREATED,
-                    })
-                  }
-                  );
+                    });
+                  });
               })
               .catch(err => {
                 if (config.DEVELOPMENT || config.TEST) {
                   console.error(err);
                 }
-                res.status(500).json(err)
+                res.status(500).json(err);
               });
           }
           return res.status(429).json({
@@ -185,7 +185,7 @@ const validate = (req, res) => {
   )
     .then(validation => {
       if (validation) {
-        if(config.TEST || config.DEVELOPMENT) {
+        if (config.TEST || config.DEVELOPMENT) {
           console.info('Validation code validated.'.green);
         }
         return res.status(202).json({

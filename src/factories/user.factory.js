@@ -7,18 +7,18 @@ const createOne = () => ({
   lastName: fakes.name.lastName(),
   mobilePhone: '323-752-6552',
   email: fakes.internet.email().toLowerCase(),
-  password: '1234Abcd!'
+  password: '1234Abcd!',
 });
 
-const createMany = (count) => {
+const createMany = count => {
   const users = [];
-  for(let i = 0; i < count; i++) {
+  for (let i = 0; i < count; i++) {
     users.push(createOne());
   }
   return users;
-}
+};
 
 export default {
   createMany,
-  createOne
-}
+  createOne,
+};

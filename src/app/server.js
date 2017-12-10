@@ -38,22 +38,24 @@ const start = (database = DB) =>
           mongoose.disconnect();
           return reject(error);
         });
-    }));
+    }),
+  );
 
 const stop = () =>
-  mongoose.disconnect().then(() =>
-    new Promise((resolve, reject) => {
-      console.log(constants.SERVER_STOPPING);
-      _server.close(err => {
-        if (err) {
-          console.error(constants.SERVER_STOP_ERROR(err));
-          return reject(err);
-        }
-        console.log('Server stopped.');
-        return resolve();
-      });
-    })
-  )
+  mongoose.disconnect().then(
+    () =>
+      new Promise((resolve, reject) => {
+        console.log(constants.SERVER_STOPPING);
+        _server.close(err => {
+          if (err) {
+            console.error(constants.SERVER_STOP_ERROR(err));
+            return reject(err);
+          }
+          console.log('Server stopped.');
+          return resolve();
+        });
+      }),
+  );
 
 export default {
   start,

@@ -72,10 +72,10 @@ const AppointmentSchema = new Schema({
     type: Date,
     required: true,
   },
-  cancelled : {
+  cancelled: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 });
 
 AppointmentSchema.plugin(uniqueValidator, {

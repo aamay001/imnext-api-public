@@ -46,51 +46,51 @@ const create = (req, res) => {
                 date: startOfDay(req.body.date),
                 time: appTime,
               })
-              .then(existing => {
-                if (!existing && user.workDays[appTime.getDay()]) {
-                  const data = {
-                    user_id: req.body.providerId,
-                    firstName: req.body.firstName,
-                    lastName: req.body.lastName,
-                    mobilePhone: req.body.mobilePhone,
-                    date: startOfDay(req.body.date),
-                    time: appTime,
-                    authorization: req.body.authorization,
-                    confirm: true,
-                    created: new Date(),
-                  };
-                  return Appointment.create(data)
-                    .then(appt =>
-                      twilio
-                        .sendSMS(
-                          constants.APPOINTMENT_SCHEDULED_SMS(
-                            appt,
-                            user.providerName,
+                .then(existing => {
+                  if (!existing && user.workDays[appTime.getDay()]) {
+                    const data = {
+                      user_id: req.body.providerId,
+                      firstName: req.body.firstName,
+                      lastName: req.body.lastName,
+                      mobilePhone: req.body.mobilePhone,
+                      date: startOfDay(req.body.date),
+                      time: appTime,
+                      authorization: req.body.authorization,
+                      confirm: true,
+                      created: new Date(),
+                    };
+                    return Appointment.create(data)
+                      .then(appt =>
+                        twilio
+                          .sendSMS(
+                            constants.APPOINTMENT_SCHEDULED_SMS(
+                              appt,
+                              user.providerName,
+                            ),
+                            req.body.mobilePhone,
+                          )
+                          .then(() =>
+                            res.status(202).json({
+                              message: constants.APPOINTMENT_CREATED,
+                              ...appt.apiGet(),
+                            }),
                           ),
-                          req.body.mobilePhone,
-                        )
-                        .then(() =>
-                          res.status(202).json({
-                            message: constants.APPOINTMENT_CREATED,
-                            ...appt.apiGet(),
-                          }),
-                        ),
-                    )
-                    .catch(error =>
-                      res.status(409).json({
-                        message: error.message,
-                      }),
-                    );
-                }
-                return res.status(409).json({
-                  message: constants.APPOINTMENT_DATETIME_UNAVAIL,
-                });
-              })
-              .catch(error =>
-                res.status(400).json({
-                  message: error.message,
-                }),
-              );
+                      )
+                      .catch(error =>
+                        res.status(409).json({
+                          message: error.message,
+                        }),
+                      );
+                  }
+                  return res.status(409).json({
+                    message: constants.APPOINTMENT_DATETIME_UNAVAIL,
+                  });
+                })
+                .catch(error =>
+                  res.status(400).json({
+                    message: error.message,
+                  }),
+                );
             }
           })
           .catch(() => {
@@ -198,7 +198,10 @@ const getAvailable = (req, res) => {
               keyTimes.breakStartTime,
               addMinutes(keyTimes.breakStartTime, keyTimes.workBreakLength - 1),
             );
-            const goesBeyondEndTime = isAfter(addMinutes(timeSlot, keyTimes.appointmentTime - 1), keyTimes.endTime);
+            const goesBeyondEndTime = isAfter(
+              addMinutes(timeSlot, keyTimes.appointmentTime - 1),
+              keyTimes.endTime,
+            );
             if (!overlapsWithBreak && !goesBeyondEndTime) {
               if (existingAppointments.length > 0) {
                 const alreadyTaken = existingAppointments.find(app =>
@@ -252,20 +255,11 @@ const getKeyTimes = (user, requestDate) => {
   }
 
   let startTime = startOfDay(requestDate);
-  startTime = addHours(
-    startTime,
-    parse(workDayStartTime).getHours(),
-  );
-  startTime = addMinutes(
-    startTime,
-    parse(workDayStartTime).getMinutes(),
-  );
+  startTime = addHours(startTime, parse(workDayStartTime).getHours());
+  startTime = addMinutes(startTime, parse(workDayStartTime).getMinutes());
   let endTime = startOfDay(requestDate);
   endTime = addHours(endTime, parse(workDayEndTime).getHours());
-  endTime = addMinutes(
-    endTime,
-    parse(workDayEndTime).getMinutes(),
-  );
+  endTime = addMinutes(endTime, parse(workDayEndTime).getMinutes());
   let breakStartTime = startOfDay(requestDate);
   breakStartTime = addHours(
     breakStartTime,
@@ -280,9 +274,9 @@ const getKeyTimes = (user, requestDate) => {
     endTime,
     breakStartTime,
     workBreakLength,
-    appointmentTime
-  }
-}
+    appointmentTime,
+  };
+};
 
 export default {
   create,

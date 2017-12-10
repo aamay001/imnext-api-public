@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
 
 mongoose.Promise = global.Promise;
 
-function dropDatabase(){
+function dropDatabase() {
   console.warn('Dropping database.'.magenta);
   return mongoose.connection.dropDatabase();
 }
@@ -17,5 +17,5 @@ function clearCollection(collectionName) {
 
 export default {
   dropDatabase,
-  clearCollection
-}
+  clearCollection,
+};
