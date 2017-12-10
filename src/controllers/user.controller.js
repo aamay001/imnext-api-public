@@ -47,7 +47,8 @@ const create = (req, res) => {
               mobilePhone: body.mobilePhone,
               type: 'ACTIVATION',
               validationCode: Math.floor(
-                Math.random() * (constants.PIN_HIGH - constants.PIN_LOW + 1) + constants.PIN_LOW,
+                Math.random() * (constants.PIN_HIGH - constants.PIN_LOW + 1) +
+                  constants.PIN_LOW,
               ),
               activationId: newUser._id.toString(),
               created: new Date(),
@@ -88,8 +89,7 @@ const get = (req, res) => {
   User.findOne({ email: req.user.email })
     .then(user => {
       if (user) {
-        return migrate(user)
-        .then(_u => {
+        return migrate(user).then(_u => {
           res.status(200).json(_u.apiGet());
         });
       }
@@ -136,6 +136,8 @@ const updateSettings = (req, res) => {
           workBreakStartTime: req.body.workBreakStartTime,
           workBreakLengthMinutes: req.body.workBreakLengthMinutes,
           providerName: req.body.providerName,
+          scheduleType: req.body.scheduleType,
+          workTimes: req.body.workTimes,
         };
         User.findByIdAndUpdate({ _id: user._id }, updateData, {
           upsert: false,
@@ -160,31 +162,31 @@ const getProviders = (req, res) => {
   });
 };
 
-const migrate = (user) => {
+const migrate = user => {
   if (user.modelVersion <= 0 || !user.modelVersion) {
     console.log(`User version: ${user.modelVersion}`);
     console.info(`Migrating user ${user.email} from undefined to verison 1`);
-    const workTimes = [{},{},{},{},{},{},{}].map(obj => ({
+    const workTimes = [{}, {}, {}, {}, {}, {}, {}].map(obj => ({
       ...obj,
       startTime: user.workDayStartTime,
       endTime: user.workDayEndTime,
       breakStartTime: user.workBreakStartTime,
       appointmentTime: user.appointmentTime,
-      breakLength: user.workBreakLengthMinutes
+      breakLength: user.workBreakLengthMinutes,
     }));
     const migrationData = {
       ...user.apiGet(),
       scheduleType: 'FIXED',
       workTimes,
-      modelVersion: 1
+      modelVersion: 1,
     };
-    return User.findByIdAndUpdate({ _id: user._id}, migrationData, {
+    return User.findByIdAndUpdate({ _id: user._id }, migrationData, {
       upsert: false,
       new: true,
-    })
+    });
   }
   return Promise.resolve(user);
-}
+};
 
 export default {
   create,

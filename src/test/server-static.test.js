@@ -17,7 +17,8 @@ describe('STATIC, SERVE'.bgWhite.black, () => {
 
   describe('index.html', () => {
     it('should serve the static index.html file', () =>
-      chai.request(app)
+      chai
+        .request(app)
         .get('/')
         .then(res => {
           expect(res.status).to.equal(200);

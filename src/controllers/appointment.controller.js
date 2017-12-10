@@ -5,6 +5,7 @@ import isBefore from 'date-fns/is_before';
 import addMinutes from 'date-fns/add_minutes';
 import addHours from 'date-fns/add_hours';
 import parse from 'date-fns/parse';
+import { isAfter } from 'date-fns';
 import isWithinRange from 'date-fns/is_within_range';
 import startOfDay from 'date-fns/start_of_day';
 import endOfDay from 'date-fns/end_of_day';
@@ -46,7 +47,7 @@ const create = (req, res) => {
                 time: appTime,
               })
                 .then(existing => {
-                  if (!existing) {
+                  if (!existing && user.workDays[appTime.getDay()]) {
                     const data = {
                       user_id: req.body.providerId,
                       firstName: req.body.firstName,
@@ -186,41 +187,22 @@ const getAvailable = (req, res) => {
           },
         }).then(existingAppointments => {
           const availbleTimeSlots = [];
-          let startTime = startOfDay(requestDate);
-          startTime = addHours(
-            startTime,
-            parse(user.workDayStartTime).getHours(),
-          );
-          startTime = addMinutes(
-            startTime,
-            parse(user.workDayStartTime).getMinutes(),
-          );
-          let endTime = startOfDay(requestDate);
-          endTime = addHours(endTime, parse(user.workDayEndTime).getHours());
-          endTime = addMinutes(
-            endTime,
-            parse(user.workDayEndTime).getMinutes(),
-          );
-          let breakStartTime = startOfDay(requestDate);
-          breakStartTime = addHours(
-            breakStartTime,
-            parse(user.workBreakStartTime).getHours(),
-          );
-          breakStartTime = addMinutes(
-            breakStartTime,
-            parse(user.workBreakStartTime).getMinutes(),
-          );
+          const keyTimes = getKeyTimes(user, requestDate);
           for (
-            let timeSlot = startTime;
-            isBefore(timeSlot, endTime);
-            timeSlot = addMinutes(timeSlot, user.appointmentTime)
+            let timeSlot = keyTimes.startTime;
+            isBefore(timeSlot, keyTimes.endTime);
+            timeSlot = addMinutes(timeSlot, keyTimes.appointmentTime)
           ) {
             const overlapsWithBreak = isWithinRange(
               timeSlot,
-              breakStartTime,
-              addMinutes(breakStartTime, user.workBreakLengthMinutes - 1),
+              keyTimes.breakStartTime,
+              addMinutes(keyTimes.breakStartTime, keyTimes.workBreakLength - 1),
             );
-            if (!overlapsWithBreak) {
+            const goesBeyondEndTime = isAfter(
+              addMinutes(timeSlot, keyTimes.appointmentTime - 1),
+              keyTimes.endTime,
+            );
+            if (!overlapsWithBreak && !goesBeyondEndTime) {
               if (existingAppointments.length > 0) {
                 const alreadyTaken = existingAppointments.find(app =>
                   isEqual(app.time, timeSlot),
@@ -248,6 +230,52 @@ const getAvailable = (req, res) => {
         message: constants.INTERNAL_SERVER_ERROR,
       });
     });
+};
+
+const getKeyTimes = (user, requestDate) => {
+  let workDayStartTime;
+  let workDayEndTime;
+  let workBreakStartTime;
+  let workBreakLength;
+  let appointmentTime;
+
+  if (user.scheduleType === 'FIXED') {
+    workDayStartTime = user.workDayStartTime;
+    workDayEndTime = user.workDayEndTime;
+    workBreakStartTime = user.workBreakStartTime;
+    workBreakLength = user.workBreakLengthMinutes;
+    appointmentTime = user.appointmentTime;
+  } else {
+    const day = startOfDay(requestDate).getDay();
+    workDayStartTime = user.workTimes[day].startTime;
+    workDayEndTime = user.workTimes[day].endTime;
+    workBreakStartTime = user.workTimes[day].breakStartTime;
+    workBreakLength = user.workTimes[day].breakLength;
+    appointmentTime = user.workTimes[day].appointmentTime;
+  }
+
+  let startTime = startOfDay(requestDate);
+  startTime = addHours(startTime, parse(workDayStartTime).getHours());
+  startTime = addMinutes(startTime, parse(workDayStartTime).getMinutes());
+  let endTime = startOfDay(requestDate);
+  endTime = addHours(endTime, parse(workDayEndTime).getHours());
+  endTime = addMinutes(endTime, parse(workDayEndTime).getMinutes());
+  let breakStartTime = startOfDay(requestDate);
+  breakStartTime = addHours(
+    breakStartTime,
+    parse(workBreakStartTime).getHours(),
+  );
+  breakStartTime = addMinutes(
+    breakStartTime,
+    parse(workBreakStartTime).getMinutes(),
+  );
+  return {
+    startTime,
+    endTime,
+    breakStartTime,
+    workBreakLength,
+    appointmentTime,
+  };
 };
 
 export default {

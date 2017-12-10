@@ -75,6 +75,8 @@ const UserSchema = new Schema({
   appointmentTime: {
     type: Number,
     default: 45,
+    min: 10,
+    max: 480,
   },
   workBreakLengthMinutes: {
     type: Number,
@@ -102,24 +104,36 @@ const UserSchema = new Schema({
     type: String,
     enum: ['FIXED', 'CUSTOM'],
     required: true,
-    default: 'FIXED'
+    default: 'FIXED',
   },
   workTimes: {
     type: Array,
     maxlength: 7,
     minlength: 7,
-    default: [{
-      startTime: Date,
-      endTime: Date,
-      breakStartTime: Date,
-      appointmentTime: Date,
-      breakLength: Number
-    }]
+    default: [
+      {
+        startTime: Date,
+        endTime: Date,
+        breakStartTime: Date,
+        appointmentTime: {
+          type: Number,
+          default: 45,
+          min: 10,
+          max: 480,
+        },
+        breakLength: {
+          type: Number,
+          min: 15,
+          max: 120,
+          default: 30,
+        },
+      },
+    ],
   },
   modelVersion: {
     type: Number,
-    default: undefined
-  }
+    default: undefined,
+  },
 });
 
 UserSchema.plugin(uniqueValidator, {
@@ -150,7 +164,6 @@ UserSchema.methods = {
       activated: this.activated,
       scheduleType: this.scheduleType,
       workTimes: this.workTimes,
-      modelVersion: this.modelVersion
     };
   },
 
@@ -194,6 +207,8 @@ UserSchema.statics = {
       'providerName',
       'appointmentTime',
       'email',
+      'scheduleType',
+      'workTimes',
     ];
   },
 };
