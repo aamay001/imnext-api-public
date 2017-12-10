@@ -136,6 +136,8 @@ const updateSettings = (req, res) => {
           workBreakStartTime: req.body.workBreakStartTime,
           workBreakLengthMinutes: req.body.workBreakLengthMinutes,
           providerName: req.body.providerName,
+          scheduleType: req.body.scheduleType,
+          workTimes: req.body.workTimes
         };
         User.findByIdAndUpdate({ _id: user._id }, updateData, {
           upsert: false,

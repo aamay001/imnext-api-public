@@ -75,6 +75,8 @@ const UserSchema = new Schema({
   appointmentTime: {
     type: Number,
     default: 45,
+    min: 10,
+    max: 480
   },
   workBreakLengthMinutes: {
     type: Number,
@@ -112,8 +114,18 @@ const UserSchema = new Schema({
       startTime: Date,
       endTime: Date,
       breakStartTime: Date,
-      appointmentTime: Date,
-      breakLength: Number
+      appointmentTime: {
+        type: Number,
+        default: 45,
+        min: 10,
+        max: 480
+      },
+      breakLength: {
+        type: Number,
+        min: 15,
+        max: 120,
+        default: 30,
+      }
     }]
   },
   modelVersion: {
@@ -149,8 +161,7 @@ UserSchema.methods = {
       providerName: this.providerName,
       activated: this.activated,
       scheduleType: this.scheduleType,
-      workTimes: this.workTimes,
-      modelVersion: this.modelVersion
+      workTimes: this.workTimes
     };
   },
 
@@ -194,6 +205,8 @@ UserSchema.statics = {
       'providerName',
       'appointmentTime',
       'email',
+      'scheduleType',
+      'workTimes'
     ];
   },
 };
