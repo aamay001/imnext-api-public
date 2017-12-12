@@ -34,25 +34,25 @@ describe('APPOINTMENTS API'.bgWhite.black, () => {
   describe('/appointments/cancel', () => {
     it('should cancel an existing appointment', () => {
       const provider = factory.user.createOne();
-      const client = factory.humanValidation.createMany();
+      let client = factory.humanValidation.createOne();
       let authToken;
-      User.create(provider)
+      return User.create(provider)
         .then( user => {
-          authToken = authController(user.apiGet());
-          HumanValidation.create(client)
+          authToken = authController.createToken(user.apiGet());
+          return HumanValidation.create(client)
             .then( humanValidation => {
-              client.providerId = user._id;
+              client.user_id = user._id;
               client.authorization = humanValidation._id;
-              Appointment.create(client)
+              client = factory.appointment.createOne(client);
+              return Appointment.create(client)
                 .then(appointment => {
                   client.appointmentId = appointment._id;
                   assert(appointment.firstName, client.firstName);
                   assert(appointment.lastName, client.lastName);
-                  assert(appointment.user_id, client.providerId);
+                  assert(appointment.user_id, client.user_id);
                   assert(appointment.authorization, client.authorization);
-                  assert(appointment.cancelled, false);
-                })
-                .then( () => chai.request(app)
+                  expect(appointment.cancelled).to.equal(false);
+                  return chai.request(app)
                     .put('/appointment/cancel')
                     .set('Authorization', `Bearer ${authToken}`)
                     .send({
@@ -60,15 +60,16 @@ describe('APPOINTMENTS API'.bgWhite.black, () => {
                       email: user.email
                     })
                     .then( res => {
-                      res.status.should.be(202);
+                      res.should.have.status(202);
                       expect(res.body.message).to.equal(constants.APPOINTMENT_CANCELLED);
-                      Appointment.findById(client.appointmentId)
+                      return Appointment.findById(client.appointmentId)
                         .then( cancelledAppointment => {
                           assert(cancelledAppointment.cancelled, true);
-                        })
-                    }))
-            })
-        })
+                        });
+                    });
+                });
+            });
+        });
     });
-  })
+  });
 });

@@ -3,15 +3,18 @@
 import fakes from 'faker';
 
 const createOne = (data) => {
-  const dateTime = fakes.date.soon();
+  const dateTime = fakes.date.future();
   return {
+    ...data,
     firstName: data.firstName,
     lastName: data.lastName,
     mobilePhone: '323-752-6552',
-    providerId: data.providerId,
+    providerId: data.user_id,
+    user_id: data.user_id,
     date: dateTime,
     time: dateTime,
-    authorization: data.authorization
+    authorization: data.authorization,
+    created: new Date()
   }
 }
 

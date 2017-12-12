@@ -74,27 +74,24 @@ describe('HUMAN VALIDATION API'.bgWhite.black, () => {
         .then(res => {
           res.should.have.status(201);
           assert(res.body.message, constants.VALIDATION_CREATED);
-        })
-        .then(() => HumanValidation.findOne({ mobilePhone: data.mobilePhone }))
-        .then(record => {
-          data.validationCode = record.validationCode;
-        })
-        .then(() =>
-          chai
-            .request(app)
-            .put('/is-human/validate')
-            .send(data)
-            .then(validation => {
-              validation.should.have.status(202);
-              validation.body.should.have.property('authorization');
-            }),
-        )
-        .then(() => HumanValidation.findOne({ mobilePhone: data.mobilePhone }))
-        .then(validation => {
-          expect(validation).to.have.property('completedOn');
-          expect(validation.completedOn).to.not.equal(null);
-          expect(validation).to.have.property('complete');
-          expect(validation.complete).to.equal(true);
+          return HumanValidation.findOne({ mobilePhone: data.mobilePhone })
+          .then(record => {
+            data.validationCode = record.validationCode;
+            return chai.request(app)
+              .put('/is-human/validate')
+              .send(data)
+              .then(validation => {
+                validation.should.have.status(202);
+                validation.body.should.have.property('authorization');
+                return HumanValidation.findOne({ mobilePhone: data.mobilePhone })
+                  .then(reValidation => {
+                    expect(reValidation).to.have.property('completedOn');
+                    expect(reValidation.completedOn).to.not.equal(null);
+                    expect(reValidation).to.have.property('complete');
+                    expect(reValidation.complete).to.equal(true);
+                })
+            });
+          });
         });
     });
   });
@@ -108,55 +105,45 @@ describe('HUMAN VALIDATION API'.bgWhite.black, () => {
         .send(data)
         .then(res => {
           res.should.contain.status(201);
-        })
-        .then(() => {
-          HumanValidation.findOne({
-            mobilePhone: data.mobilePhone,
-          }).then(validation => {
-            assert(validation.firstName, data.firstName);
-            assert(validation.lastName, data.lastName);
-            data.validationCode = validation.validationCode;
-          });
-        })
-        .then(() => {
-          const token = authController.createToken(data);
-          return chai
-            .request(app)
-            .post('/auth/login')
-            .auth(data.email, data.password)
-            .then(auth => {
-              auth.should.have.status(200);
-              expect(auth.body).to.include.keys(['authToken']);
-              assert(typeof token, 'string');
-              assert(auth.body.user.email, data.email);
-              assert(auth.body.user.mobilePhone, data.mobilePhone);
-              data.authToken = auth.body.authToken;
+          return HumanValidation.findOne({mobilePhone: data.mobilePhone})
+          .then(_validation => {
+            assert(_validation.firstName, data.firstName);
+            assert(_validation.lastName, data.lastName);
+            data.validationCode = _validation.validationCode;
+            const token = authController.createToken(data);
+            return chai.request(app)
+              .post('/auth/login')
+              .auth(data.email, data.password)
+              .then(auth => {
+                auth.should.have.status(200);
+                expect(auth.body).to.include.keys(['authToken']);
+                assert(typeof token, 'string');
+                assert(auth.body.user.email, data.email);
+                assert(auth.body.user.mobilePhone, data.mobilePhone);
+                data.authToken = auth.body.authToken;
+                const validation = {
+                  email: data.email,
+                  mobilePhone: data.mobilePhone,
+                  validationCode: data.validationCode,
+                };
+                return chai.request(app)
+                  .put('/is-human/activate')
+                  .set('Authorization', `Bearer ${data.authToken}`)
+                  .send(validation)
+                  .then(_res => {
+                    _res.should.have.status(202);
+                    assert(_res.body.message, constants.ACCOUNT_ACTIVATED);
+                    return User.findOne({ email: data.email })
+                      .then(user => {
+                        assert(user.mobilePhone, data.mobilePhone);
+                        assert(user.firstName, data.firstName);
+                        assert(user.lastName, data.lastName);
+                        assert(user.activated, true);
+                      })
+                  })
             });
-        })
-        .then(() => {
-          const validation = {
-            email: data.email,
-            mobilePhone: data.mobilePhone,
-            validationCode: data.validationCode,
-          };
-          return chai
-            .request(app)
-            .put('/is-human/activate')
-            .set('Authorization', `Bearer ${data.authToken}`)
-            .send(validation);
-        })
-        .then(res => {
-          res.should.have.status(202);
-          assert(res.body.message, constants.ACCOUNT_ACTIVATED);
-        })
-        .then(() =>
-          User.findOne({ email: data.email }).then(user => {
-            assert(user.mobilePhone, data.mobilePhone);
-            assert(user.firstName, data.firstName);
-            assert(user.lastName, data.lastName);
-            assert(user.activated, true);
-          }),
-        );
+          });
+      });
     });
   });
 });
