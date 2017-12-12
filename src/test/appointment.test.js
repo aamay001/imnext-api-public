@@ -25,11 +25,10 @@ describe('APPOINTMENTS API'.bgWhite.black, () => {
     stopServer();
   });
 
-  afterEach(() => {
-    testUtility.clearCollection('appointments');
-    testUtility.clearCollection('humanvalidations');
-    testUtility.clearCollection('users');
-  });
+  afterEach(() => testUtility.clearCollection('appointments')
+    .then(() => testUtility.clearCollection('humanvalidations'))
+    .then(() => testUtility.clearCollection('users'))
+  );
 
   describe('/appointments/cancel', () => {
     it('should cancel an existing appointment', () => {

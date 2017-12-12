@@ -28,10 +28,9 @@ describe('USER API'.bgWhite.black, () => {
     stopServer();
   });
 
-  afterEach(() => {
-    testUtility.clearCollection('humanvalidations');
-    testUtility.clearCollection('users');
-  });
+  afterEach(() => testUtility.clearCollection('humanvalidations')
+    .then(()=> testUtility.clearCollection('users'))
+  );
 
   describe('/user', () => {
     it('should create a new user', () => {

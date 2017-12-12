@@ -28,10 +28,9 @@ describe('HUMAN VALIDATION API'.bgWhite.black, () => {
     stopServer();
   });
 
-  afterEach(() => {
-    testUtility.clearCollection('humanvalidations');
-    testUtility.clearCollection('users');
-  });
+  afterEach(() => testUtility.clearCollection('humanvalidations')
+    .then(()=> testUtility.clearCollection('users'))
+  );
 
   describe('/is-human/', () => {
     it('should create a human validation record of type APPOINTMENT', () => {
