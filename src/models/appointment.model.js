@@ -106,7 +106,10 @@ AppointmentSchema.statics = {
     ];
   },
   getRequiredForGet() {
-    return ['email', 'date'];
+    return [
+      'email',
+      'date'
+    ];
   },
 };
 

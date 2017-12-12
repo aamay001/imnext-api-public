@@ -136,6 +136,7 @@ const getAppointments = (req, res) => {
         return Appointment.find({
           user_id: user._id,
           date: { $gte: req.query.date },
+          cancelled: false
         }).then(apps => {
           const appointmentsMap = new Map();
           apps.forEach(_app => {
@@ -158,6 +159,49 @@ const getAppointments = (req, res) => {
       });
     });
 };
+
+const cancelAppointment = (req, res) => {
+  const requiredFields = ['email', 'appointmentId'];
+  for(let i = 0; i < requiredFields.length; i++) {
+    const field = requiredFields[i];
+    if (!(field in req.body)) {
+      return res.status(400).json({
+        message: constants.MISSING_FIELD(field)
+      });
+    }
+  }
+  if (req.body.email !== req.user.email) {
+    return res.status(400).json({
+      message: constants.EMAIL_AUTH_MISMATCH,
+    });
+  }
+  Appointment.findOneAndUpdate({
+      user_id: req.user._id,
+      _id: req.body.appointmentId,
+      cancelled: false
+    }, {
+      cancelled: true
+    }, {
+      upsert: false,
+      new: true,
+    })
+    .then(appointment => {
+      if (appointment) {
+        return res.status(202).json({
+          message: constants.APPOINTMENT_CANCELLED
+        })
+      }
+      return res.status(400).json({
+        message: constants.APPOINTMENT_CANCELLATION_FAILED,
+      });
+    })
+    .catch(err => {
+      console.error(err);
+      res.status(501).json({
+        message: constants.INTERNAL_SERVER_ERROR,
+      });
+    });
+}
 
 const getAvailable = (req, res) => {
   const requiredFields = ['provider', 'date'];
@@ -282,4 +326,5 @@ export default {
   create,
   getAppointments,
   getAvailable,
+  cancel : cancelAppointment
 };

@@ -17,5 +17,10 @@ router.get(
   jsonParser,
   controllers.appointment.getAppointments,
 );
+router.put(
+  '/cancel',
+  jwtAuth,
+  jsonParser,
+  controllers.appointment.cancel);
 
 export default router;

@@ -6,6 +6,7 @@ const createOne = () => ({
   firstName: fakes.name.firstName(),
   lastName: fakes.name.lastName(),
   mobilePhone: '323-752-6552',
+  created: new Date()
 });
 
 const createMany = count => {

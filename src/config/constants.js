@@ -59,6 +59,8 @@ export default {
   APPOINTMENT_DATETIME_UNAVAIL:
     'The appointment date and time is no longer available.',
   APPOINTMENT_CREATED: 'Appointment scheduled!',
+  APPOINTMENT_CANCELLATION_FAILED: 'Appointment is either already cancelled or does not exist',
+  APPOINTMENT_CANCELLED: 'Appointment was cancelled successfully.',
   APPOINTMENT_SCHEDULED_SMS: (appt, provider) =>
     `Appointment Scheduled: ${format(
       appt.date,
