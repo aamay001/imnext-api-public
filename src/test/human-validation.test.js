@@ -43,23 +43,23 @@ describe('HUMAN VALIDATION API'.bgWhite.black, () => {
         .then(res => {
           res.should.have.status(201);
           assert(res.body.message, constants.VALIDATION_CREATED);
-        })
-        .then(() => HumanValidation.findOne({ mobilePhone: data.mobilePhone }))
-        .then(record => {
-          expect(record).to.have.property('firstName');
-          expect(record).to.have.property('lastName');
-          expect(record).to.have.property('mobilePhone');
-          expect(record).to.have.property('created');
-          expect(record).to.have.property('type');
-          expect(record).to.have.property('validationCode');
-          expect(record).to.have.property('expiration');
-          expect(record).to.have.property('complete');
-          expect(record).to.have.property('completedOn');
-          record.complete.should.deep.equal(false);
-          record.firstName.should.deep.equal(data.firstName);
-          record.lastName.should.deep.equal(data.lastName);
-          record.mobilePhone.should.deep.equal(data.mobilePhone);
-          record.type.should.deep.equal('APPOINTMENT');
+          return HumanValidation.findOne({ mobilePhone: data.mobilePhone })
+            .then(record => {
+              expect(record).to.have.property('firstName');
+              expect(record).to.have.property('lastName');
+              expect(record).to.have.property('mobilePhone');
+              expect(record).to.have.property('created');
+              expect(record).to.have.property('type');
+              expect(record).to.have.property('validationCode');
+              expect(record).to.have.property('expiration');
+              expect(record).to.have.property('complete');
+              expect(record).to.have.property('completedOn');
+              record.complete.should.deep.equal(false);
+              record.firstName.should.deep.equal(data.firstName);
+              record.lastName.should.deep.equal(data.lastName);
+              record.mobilePhone.should.deep.equal(data.mobilePhone);
+              record.type.should.deep.equal('APPOINTMENT');
+            })
         });
     });
   });
