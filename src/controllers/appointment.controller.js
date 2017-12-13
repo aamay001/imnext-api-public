@@ -136,7 +136,7 @@ const getAppointments = (req, res) => {
         return Appointment.find({
           user_id: user._id,
           date: { $gte: req.query.date },
-          cancelled: false || undefined
+          cancelled: false
         }).then(apps => {
           const appointmentsMap = new Map();
           apps.forEach(_app => {
