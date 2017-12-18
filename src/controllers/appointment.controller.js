@@ -44,6 +44,7 @@ const create = (req, res) => {
               return Appointment.findOne({
                 user_id: req.body.providerId,
                 date: startOfDay(req.body.date),
+                cancelled: false,
                 time: appTime,
               })
                 .then(existing => {
@@ -166,13 +167,15 @@ const cancelAppointment = (req, res) => {
     const field = requiredFields[i];
     if (!(field in req.body)) {
       return res.status(400).json({
-        message: constants.MISSING_FIELD(field)
+        message: constants.MISSING_FIELD(field),
+        ok: false
       });
     }
   }
   if (req.body.email !== req.user.email) {
     return res.status(400).json({
       message: constants.EMAIL_AUTH_MISMATCH,
+      ok: false
     });
   }
   Appointment.findOneAndUpdate({
@@ -188,17 +191,20 @@ const cancelAppointment = (req, res) => {
     .then(appointment => {
       if (appointment) {
         return res.status(202).json({
-          message: constants.APPOINTMENT_CANCELLED
+          message: constants.APPOINTMENT_CANCELLED,
+          ok: true
         })
       }
       return res.status(400).json({
         message: constants.APPOINTMENT_CANCELLATION_FAILED,
+        ok: false
       });
     })
     .catch(err => {
       console.error(err);
       res.status(501).json({
         message: constants.INTERNAL_SERVER_ERROR,
+        ok: false
       });
     });
 }
@@ -225,6 +231,7 @@ const getAvailable = (req, res) => {
         }
         return Appointment.find({
           user_id: user._id,
+          cancelled: false,
           date: {
             $gte: startOfDay(requestDate),
             $lte: endOfDay(requestDate),
